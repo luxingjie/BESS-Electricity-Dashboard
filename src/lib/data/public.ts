@@ -28,15 +28,6 @@ export type PublicDashboardData = {
   cfdAuctions: ChinaCfdAuction[];
 };
 
-const EMPTY_DATA: PublicDashboardData = {
-  configured: false,
-  regions: [],
-  signals: [],
-  marketMetrics: [],
-  provinceTopics: [],
-  cfdAuctions: [],
-};
-
 export async function getPublicDashboardData(): Promise<PublicDashboardData> {
   if (!getSupabaseConfig()) {
     // Fallback: return mock data when Supabase is not configured

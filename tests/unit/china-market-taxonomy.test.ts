@@ -17,16 +17,17 @@ const EXPECTED_TOPIC_IDS = [
   "storage-operating-costs",
   "green-power-direct-connection",
   "retail-rules",
+  "renewable-mechanism-price",
 ];
 
 describe("China provincial market atlas taxonomy", () => {
-  it("defines seven distinct topics and 217 province-topic cells", () => {
+  it("defines eight distinct topics and 248 province-topic cells", () => {
     expect(CHINA_MARKET_TOPICS.map((topic) => topic.id)).toEqual(
       EXPECTED_TOPIC_IDS,
     );
     expect(CHINA_MARKET_TOPIC_IDS).toEqual(EXPECTED_TOPIC_IDS);
-    expect(new Set(CHINA_MARKET_TOPICS.map((topic) => topic.id)).size).toBe(7);
-    expect(31 * CHINA_MARKET_TOPICS.length).toBe(217);
+    expect(new Set(CHINA_MARKET_TOPICS.map((topic) => topic.id)).size).toBe(8);
+    expect(31 * CHINA_MARKET_TOPICS.length).toBe(248);
   });
 
   it("keeps requested subfields and separates revenue from grid cost", () => {
@@ -80,20 +81,20 @@ describe("China provincial market atlas taxonomy", () => {
   });
 
   it("keeps the database topic/field allow-list aligned with the shared taxonomy", () => {
-    const migration = readFileSync(
-      fileURLToPath(
-        new URL(
-          "../../supabase/migrations/202607240001_china_province_topic_module.sql",
-          import.meta.url,
-        ),
-      ),
-      "utf8",
-    );
+    const migrationHistory = [
+      "../../supabase/migrations/202607240001_china_province_topic_module.sql",
+      "../../supabase/migrations/202607280001_add_renewable_mechanism_price_topic.sql",
+      "../../supabase/migrations/202607280002_renewable_mechanism_price_topic_validation.sql",
+    ]
+      .map((path) =>
+        readFileSync(fileURLToPath(new URL(path, import.meta.url)), "utf8"),
+      )
+      .join("\n");
 
     for (const topic of CHINA_MARKET_TOPICS) {
-      expect(migration).toContain(`'${topic.id}'`);
+      expect(migrationHistory).toContain(`'${topic.id}'`);
       for (const field of topic.fields) {
-        expect(migration).toContain(`'${field.key}'`);
+        expect(migrationHistory).toContain(`'${field.key}'`);
       }
     }
   });
