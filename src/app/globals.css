@@ -571,12 +571,12 @@ a:focus-visible {
 
 .gl-hero {
   position: relative;
-  min-height: 280px;
+  min-height: 200px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 260px;
   gap: 40px;
   align-items: end;
-  padding: 58px 0 44px;
+  padding: 36px 0 28px;
   overflow: hidden;
 }
 

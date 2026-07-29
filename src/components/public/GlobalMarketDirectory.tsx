@@ -28,7 +28,8 @@ function regionLabel(region: GlobalDirectoryRegion): string {
 }
 
 function defaultRegionHref(region: GlobalDirectoryRegion): string {
-  return region.region_type === "global" ? "/" : `/regions/${region.slug}`;
+  if (region.region_type === "global") return "/";
+  return `/regions/${region.slug}#region-policy`;
 }
 
 function descendantIds(
@@ -353,7 +354,7 @@ export function GlobalMarketDirectory({
                   href={getRegionHref(entry.continent)}
                   aria-current={activeRegionId === entry.continent.id ? "page" : undefined}
                 >
-                  进入大洲档案 <span aria-hidden="true">↗</span>
+                  进入大洲政策流 <span aria-hidden="true">↗</span>
                 </a>
               </footer>
             </article>

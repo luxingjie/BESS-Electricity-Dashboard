@@ -18,6 +18,8 @@ const EXPECTED_GLOBAL_DIRECTORY = [
       ["韩国", "south-korea", "KR"],
       ["印度", "india", "IN"],
       ["新加坡", "singapore", "SG"],
+      ["马来西亚", "malaysia", "MY"],
+      ["印度尼西亚", "indonesia", "ID"],
     ],
   },
   {
@@ -192,7 +194,7 @@ describe("global region seed hierarchy", () => {
         region.regionType === "continent" && region.parentId === GLOBAL_ID,
     );
 
-    expect(allRegions).toHaveLength(62);
+    expect(allRegions).toHaveLength(64);
     expect(global).toMatchObject({
       slug: "global",
       regionType: "global",
@@ -226,7 +228,7 @@ describe("global region seed hierarchy", () => {
     const representativeCountries = allRegions.filter(
       (region) => region.regionType === "country",
     );
-    expect(representativeCountries).toHaveLength(24);
+    expect(representativeCountries).toHaveLength(26);
     expect(representativeCountries.every((region) => region.isDemo)).toBe(true);
     expect(allRegions.find((region) => region.id === CHINA_ID)?.parentId).toBe(
       "00000000-0000-4000-8000-000000000101",

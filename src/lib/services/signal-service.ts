@@ -51,7 +51,7 @@ export class SignalService {
 
   /**
    * Creates or updates a manually entered draft. Manual entries use
-   * pending_review; ai_draft remains reserved for a future AI import task.
+   * pending_review; ai_draft is reserved for weekly policy ingest.
    */
   async saveDraft(
     actor: Actor | null | undefined,

@@ -71,6 +71,13 @@ export interface Signal {
   reviewer_id?: string | null;
   reviewed_at: string | null;
   created_by?: string | null;
+  /** Whitelist feed that produced this AI draft (policy ingest). */
+  feed_id?: string | null;
+  ingest_run_id?: string | null;
+  content_hash?: string | null;
+  ai_importance?: number | null;
+  /** Official document / docket / file number when known. */
+  document_id?: string | null;
 }
 
 export interface MarketMetric {

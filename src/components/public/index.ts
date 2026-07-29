@@ -31,6 +31,7 @@ export type {
   GlobalDirectoryRegion,
   GlobalMarketDirectoryProps,
 } from "./GlobalMarketDirectory";
+export { PolicyFeed } from "./PolicyFeed";
 export {
   formatDate,
   formatNullableNumber,

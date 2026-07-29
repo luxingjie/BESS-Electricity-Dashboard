@@ -17,7 +17,7 @@ export default async function AdminDashboardPage() {
         <article><span>市场指标</span><strong>{metrics.length}</strong></article>
         <article><span>省级专题</span><strong>{provinceTopics.length}</strong></article>
       </section>
-      <section className="admin-panel"><div className="admin-panel-header"><div><span className="section-kicker">Publishing gate</span><h2>发布检查</h2></div></div><p>Signal、通用市场指标和省级八专题是三个独立模块。八专题记录必须逐字段说明值或缺失状态，并保存字段级证据定位；发布身份与时间由服务端写入。</p><div className="admin-quick-actions"><Link href="/admin/signals">打开 Signal 列表</Link><Link href="/admin/market-metrics">维护市场指标</Link><Link href="/admin/province-topics">维护省级八专题</Link></div></section>
+      <section className="admin-panel"><div className="admin-panel-header"><div><span className="section-kicker">Publishing gate</span><h2>发布检查</h2></div></div><p>Signal、通用市场指标和省级八专题是三个独立模块。八专题记录必须逐字段说明值或缺失状态，并保存字段级证据定位；发布身份与时间由服务端写入。政策动态周抓取写入 AI 草稿后，仍须人工发布。</p><div className="admin-quick-actions"><Link href="/admin/signals">打开 Signal 列表</Link><Link href="/admin/policy-ingest">政策抓取 / 立即跑一轮</Link><Link href="/admin/market-metrics">维护市场指标</Link><Link href="/admin/province-topics">维护省级八专题</Link></div></section>
     </>
   );
 }

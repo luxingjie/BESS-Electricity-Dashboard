@@ -33,11 +33,13 @@ export async function getAdminDashboardData() {
   return { regions, signals, metrics, provinceTopics };
 }
 
-export async function getAdminSignalListData() {
+export async function getAdminSignalListData(query?: {
+  review_status?: import("@/lib/types").ReviewStatus;
+}) {
   const repository = await repositories();
   const [regions, signals] = await Promise.all([
     repository.regions.list(),
-    repository.signals.listAdmin(),
+    repository.signals.listAdmin(query),
   ]);
   return { regions, signals };
 }
