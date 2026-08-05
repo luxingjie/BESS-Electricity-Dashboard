@@ -83,7 +83,7 @@ describe("China provincial market atlas taxonomy", () => {
   it("keeps the database topic/field allow-list aligned with the shared taxonomy", () => {
     // Initial seven-topic module plus follow-up enum/field migrations for
     // renewable-mechanism-price (Postgres cannot add + use an enum in one txn).
-    const migrationHistory = [
+    const migration = [
       "202607240001_china_province_topic_module.sql",
       "202607280001_add_renewable_mechanism_price_topic.sql",
       "202607280002_renewable_mechanism_price_topic_validation.sql",
@@ -99,9 +99,9 @@ describe("China provincial market atlas taxonomy", () => {
       .join("\n");
 
     for (const topic of CHINA_MARKET_TOPICS) {
-      expect(migrationHistory).toContain(`'${topic.id}'`);
+      expect(migration).toContain(`'${topic.id}'`);
       for (const field of topic.fields) {
-        expect(migrationHistory).toContain(`'${field.key}'`);
+        expect(migration).toContain(`'${field.key}'`);
       }
     }
   });
