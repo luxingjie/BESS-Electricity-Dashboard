@@ -3,8 +3,10 @@ import Link from "next/link";
 import { RunPolicyIngestButton } from "@/components/admin/run-policy-ingest-button";
 import { getSupabaseConfig } from "@/lib/supabase/config";
 import {
+  POLICY_INGEST_AUTO_PUBLISH_MIN,
+  POLICY_INGEST_DAILY_CAP,
   POLICY_INGEST_LOOKBACK_DAYS,
-  POLICY_INGEST_WEEKLY_CAP,
+  POLICY_INGEST_MIN_IMPORTANCE,
   POLICY_INGEST_REGION_QUOTAS,
 } from "@/lib/policy-ingest/config";
 import { PolicyIngestRepository } from "@/lib/policy-ingest/repository";
@@ -63,7 +65,7 @@ export default async function AdminPolicyIngestPage() {
     <>
       <header className="admin-page-header">
         <div>
-          <span className="section-kicker">Weekly whitelist ingest</span>
+          <span className="section-kicker">Daily whitelist ingest</span>
           <h1>政策抓取</h1>
         </div>
         <RunPolicyIngestButton />
@@ -78,12 +80,20 @@ export default async function AdminPolicyIngestPage() {
           <Link href="/admin/signals?review_status=ai_draft">查看 AI 草稿队列 →</Link>
         </div>
         <p>
-          每周一 02:00 UTC 自动抓取（`vercel.json` cron）。仅扫描白名单 list
-          页；硬过滤解读稿后 AI 提炼中文摘要，写入 `ai_draft`，不自动发布，也不写入省专题 / CfD。
+          每日凌晨（UTC 22:00 ≈ 北京时间 06:00）自动抓取白名单源；可手动补跑。
+          双轨筛选（储能与电力市场 / ESG），排除招标融资展会与历史回顾。
+          AI 提炼中文摘要后：仅当 star_mark 且重要性 ≥{" "}
+          {POLICY_INGEST_AUTO_PUBLISH_MIN}{" "}
+          的正式政策自动发布（前台 Key 标识同阈值）；
+          {POLICY_INGEST_MIN_IMPORTANCE}–{POLICY_INGEST_AUTO_PUBLISH_MIN}{" "}
+          或未标星写入草稿。运行前清理过期/重复 `ai_draft`（已发布不硬删）。
         </p>
         <ul>
           <li>回溯窗口：近 {POLICY_INGEST_LOOKBACK_DAYS} 天</li>
-          <li>周入审上限：{POLICY_INGEST_WEEKLY_CAP} 条（全球合计）</li>
+          <li>日入审上限：{POLICY_INGEST_DAILY_CAP} 条（全球合计）</li>
+          <li>
+            自动发布：star_mark && importance ≥ {POLICY_INGEST_AUTO_PUBLISH_MIN}
+          </li>
           <li>
             区域软配额：
             {Object.entries(POLICY_INGEST_REGION_QUOTAS)
@@ -166,7 +176,9 @@ export default async function AdminPolicyIngestPage() {
               <th>开始</th>
               <th>触发</th>
               <th>状态</th>
+              <th>自动发布</th>
               <th>草稿</th>
+              <th>清理</th>
               <th>跳过</th>
               <th>候选</th>
               <th>源数</th>
@@ -178,7 +190,9 @@ export default async function AdminPolicyIngestPage() {
                 <td>{new Date(run.started_at).toLocaleString("zh-CN")}</td>
                 <td>{run.trigger}</td>
                 <td>{run.status}</td>
-                <td>{run.drafts_created}</td>
+                <td>{run.auto_published ?? 0}</td>
+                <td>{run.drafts_retained ?? run.drafts_created}</td>
+                <td>{run.drafts_cleaned ?? 0}</td>
                 <td>{run.skips_recorded}</td>
                 <td>{run.candidates_seen}</td>
                 <td>{run.feeds_scanned}</td>

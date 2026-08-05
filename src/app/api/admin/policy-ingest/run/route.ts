@@ -39,6 +39,8 @@ export async function POST(request: Request) {
       data: {
         run: result.run,
         draft_ids: result.draftIds,
+        published_ids: result.publishedIds,
+        drafts_cleaned: result.draftsCleaned,
       },
     });
   } catch (error) {

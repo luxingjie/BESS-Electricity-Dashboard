@@ -9,12 +9,15 @@ import type {
 } from "@/lib/repositories/contracts";
 import type { Region, Signal } from "@/lib/types";
 
+import { selectAiDraftsToClean } from "./cleanup";
 import type { PolicyAiExtractor } from "./ai";
 import {
+  decideIngestDisposition,
+  POLICY_INGEST_AUTO_PUBLISH_MIN,
+  POLICY_INGEST_DAILY_CAP,
   POLICY_INGEST_LOOKBACK_DAYS,
   POLICY_INGEST_MAX_CANDIDATES_PER_FEED,
   POLICY_INGEST_MIN_IMPORTANCE,
-  POLICY_INGEST_WEEKLY_CAP,
   regionQuota,
 } from "./config";
 import {
@@ -35,6 +38,8 @@ import type {
 export type PolicyIngestRunResult = {
   run: PolicyIngestRun;
   draftIds: string[];
+  publishedIds: string[];
+  draftsCleaned: number;
 };
 
 export class PolicyIngestService {
@@ -53,10 +58,13 @@ export class PolicyIngestService {
     trigger: PolicyIngestTrigger;
     actorId: string | null;
     lookbackDays?: number;
+    dailyCap?: number;
+    /** @deprecated Use dailyCap */
     weeklyCap?: number;
   }): Promise<PolicyIngestRunResult> {
     const lookbackDays = options.lookbackDays ?? POLICY_INGEST_LOOKBACK_DAYS;
-    const weeklyCap = options.weeklyCap ?? POLICY_INGEST_WEEKLY_CAP;
+    const dailyCap =
+      options.dailyCap ?? options.weeklyCap ?? POLICY_INGEST_DAILY_CAP;
     const now = this.clock();
     const nowIso = now.toISOString();
 
@@ -64,23 +72,29 @@ export class PolicyIngestService {
       trigger: options.trigger,
       status: "running",
       lookback_days: lookbackDays,
-      weekly_cap: weeklyCap,
+      weekly_cap: dailyCap,
       started_at: nowIso,
       finished_at: null,
       feeds_scanned: 0,
       candidates_seen: 0,
       drafts_created: 0,
+      auto_published: 0,
+      drafts_retained: 0,
+      drafts_cleaned: 0,
       skips_recorded: 0,
       error_message: null,
       created_by: options.actorId,
     });
 
+    const createdIds: string[] = [];
+    const publishedIds: string[] = [];
     const draftIds: string[] = [];
     const acceptedTitles: string[] = [];
     const regionDraftCounts = new Map<string, number>();
     let feedsScanned = 0;
     let candidatesSeen = 0;
     let skipsRecorded = 0;
+    let draftsCleaned = 0;
 
     const skip = async (input: {
       feed_id: string | null;
@@ -101,6 +115,8 @@ export class PolicyIngestService {
     };
 
     try {
+      draftsCleaned = await this.cleanupAiDrafts(lookbackDays, now);
+
       const allRegions = await this.regions.list();
       const regionBySlug = new Map(
         allRegions
@@ -119,7 +135,7 @@ export class PolicyIngestService {
       };
 
       for (const feed of enabledFeeds) {
-        if (draftIds.length >= weeklyCap) break;
+        if (createdIds.length >= dailyCap) break;
         feedsScanned += 1;
 
         const region = regionBySlug.get(feed.region_slug);
@@ -154,13 +170,13 @@ export class PolicyIngestService {
         });
 
         for (const candidate of candidates) {
-          if (draftIds.length >= weeklyCap) {
+          if (createdIds.length >= dailyCap) {
             await skip({
               feed_id: feed.id,
               source_url: candidate.url,
               title: candidate.title,
               reason: "weekly_cap",
-              detail: `已达周入审上限 ${weeklyCap}`,
+              detail: `已达日入审上限 ${dailyCap}`,
             });
             continue;
           }
@@ -190,7 +206,8 @@ export class PolicyIngestService {
           }
 
           const normalizedUrl = normalizePolicyUrl(candidate.url);
-          const existingUrl = await this.feeds.findSignalBySourceUrl(normalizedUrl);
+          const existingUrl =
+            await this.feeds.findSignalBySourceUrl(normalizedUrl);
           if (existingUrl) {
             await skip({
               feed_id: feed.id,
@@ -241,9 +258,14 @@ export class PolicyIngestService {
           });
 
           if (created) {
-            draftIds.push(created.id);
+            createdIds.push(created.id);
             acceptedTitles.push(created.title || candidate.title);
             regionDraftCounts.set(feed.region_slug, used + 1);
+            if (created.review_status === "published") {
+              publishedIds.push(created.id);
+            } else {
+              draftIds.push(created.id);
+            }
           }
         }
       }
@@ -253,12 +275,20 @@ export class PolicyIngestService {
         finished_at: this.clock().toISOString(),
         feeds_scanned: feedsScanned,
         candidates_seen: candidatesSeen,
-        drafts_created: draftIds.length,
+        drafts_created: createdIds.length,
+        auto_published: publishedIds.length,
+        drafts_retained: draftIds.length,
+        drafts_cleaned: draftsCleaned,
         skips_recorded: skipsRecorded,
         updated_at: this.clock().toISOString(),
       });
 
-      return { run: finished, draftIds };
+      return {
+        run: finished,
+        draftIds,
+        publishedIds,
+        draftsCleaned,
+      };
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       const failed = await this.feeds.updateRun(run.id, {
@@ -266,13 +296,30 @@ export class PolicyIngestService {
         finished_at: this.clock().toISOString(),
         feeds_scanned: feedsScanned,
         candidates_seen: candidatesSeen,
-        drafts_created: draftIds.length,
+        drafts_created: createdIds.length,
+        auto_published: publishedIds.length,
+        drafts_retained: draftIds.length,
+        drafts_cleaned: draftsCleaned,
         skips_recorded: skipsRecorded,
         error_message: message.slice(0, 4_000),
         updated_at: this.clock().toISOString(),
       });
-      return { run: failed, draftIds };
+      return {
+        run: failed,
+        draftIds,
+        publishedIds,
+        draftsCleaned,
+      };
     }
+  }
+
+  private async cleanupAiDrafts(
+    lookbackDays: number,
+    now: Date,
+  ): Promise<number> {
+    const drafts = await this.feeds.listAiDraftSignals();
+    const ids = selectAiDraftsToClean(drafts, lookbackDays, now);
+    return this.feeds.deleteAiDraftsByIds(ids);
   }
 
   private async ingestDetail(input: {
@@ -339,30 +386,34 @@ export class PolicyIngestService {
       return null;
     }
 
-    if (draft.is_commentary || !draft.is_formal_policy) {
+    const disposition = decideIngestDisposition(draft);
+    if (disposition === "reject") {
       await input.skip({
         feed_id: input.feed.id,
         source_url: input.candidateUrl,
         title: draft.title_zh || input.listTitle,
-        reason: draft.is_commentary ? "commentary" : "not_policy",
-        detail: "AI 判定非正式政策或属解读稿",
-      });
-      return null;
-    }
-
-    if (draft.importance < POLICY_INGEST_MIN_IMPORTANCE) {
-      await input.skip({
-        feed_id: input.feed.id,
-        source_url: input.candidateUrl,
-        title: draft.title_zh,
-        reason: "below_importance",
-        detail: `importance=${draft.importance}`,
+        reason: draft.is_commentary
+          ? "commentary"
+          : draft.policy_track === "none"
+            ? "out_of_scope"
+            : draft.importance < POLICY_INGEST_MIN_IMPORTANCE
+              ? "below_importance"
+              : "not_policy",
+        detail: draft.is_commentary
+          ? "AI 判定属解读稿"
+          : draft.policy_track === "none"
+            ? "未落入储能电力市场/ESG 双轨"
+            : !draft.is_formal_policy
+              ? "AI 判定非正式政策"
+              : `importance=${draft.importance}`,
       });
       return null;
     }
 
     if (draft.document_id) {
-      const existingDoc = await this.feeds.findSignalByDocumentId(draft.document_id);
+      const existingDoc = await this.feeds.findSignalByDocumentId(
+        draft.document_id,
+      );
       if (existingDoc) {
         await input.skip({
           feed_id: input.feed.id,
@@ -393,34 +444,48 @@ export class PolicyIngestService {
     }
 
     const nowIso = this.clock().toISOString();
+    const autoPublish = disposition === "publish";
+    const starMarked = Boolean(draft.star_mark);
+    // Keep titles clean; public UI uses the Key badge driven by star_mark.
+    const titleZh = draft.title_zh.replace(/^[（(]\*\*\*[）)]\s*/, "");
+    const importance = starMarked
+      ? Math.max(draft.importance, POLICY_INGEST_AUTO_PUBLISH_MIN)
+      : draft.importance;
     const record: CreateSignalRecord = {
       region_id: input.region.id,
       signal_type: "policy",
-      title: draft.title_zh,
+      title: titleZh,
       summary: draft.summary_zh,
+      body: draft.body_zh,
       category: draft.category,
+      policy_track: draft.policy_track,
+      star_mark: starMarked,
       original_status: null,
       normalized_status: draft.normalized_status,
       event_date: draft.event_date,
-      effective_date: null,
+      effective_date: draft.effective_date,
+      expires_at: draft.expires_at,
       impact_channel: null,
       impact_direction: null,
-      impact_level: null,
+      impact_level: starMarked ? "high" : null,
       source_url: input.candidateUrl,
       source_name: input.feed.source_name,
-      reviewer_note: null,
-      review_status: "ai_draft",
-      published_at: null,
+      issuer: draft.issuer ?? input.feed.source_name,
+      reviewer_note: autoPublish ? "AI auto-publish" : null,
+      needs_human_review: !autoPublish,
+      review_status: autoPublish ? "published" : "ai_draft",
+      published_at: autoPublish ? nowIso : null,
       created_at: nowIso,
       updated_at: nowIso,
+      crawled_at: nowIso,
       is_demo: false,
       reviewer_id: null,
-      reviewed_at: null,
+      reviewed_at: autoPublish ? nowIso : null,
       created_by: input.actorId === "cron" ? null : input.actorId,
       feed_id: input.feed.id,
       ingest_run_id: input.runId,
       content_hash: hash,
-      ai_importance: draft.importance,
+      ai_importance: importance,
       document_id: draft.document_id,
     };
 

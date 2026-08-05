@@ -68,27 +68,66 @@ export class PolicyIngestRepository {
   }
 
   async createRun(input: CreatePolicyIngestRunInput): Promise<PolicyIngestRun> {
+    const {
+      auto_published: _autoPublished,
+      drafts_retained: _draftsRetained,
+      drafts_cleaned: _draftsCleaned,
+      ...legacy
+    } = input;
     const { data, error } = await this.client
       .from("policy_ingest_runs")
-      .insert(input)
+      .insert(legacy)
       .select("*")
       .single();
     throwIfError("create policy ingest run", error);
-    return data as PolicyIngestRun;
+    return {
+      ...(data as PolicyIngestRun),
+      auto_published: _autoPublished ?? 0,
+      drafts_retained: _draftsRetained ?? 0,
+      drafts_cleaned: _draftsCleaned ?? 0,
+    };
   }
 
   async updateRun(
     id: string,
     input: UpdatePolicyIngestRunInput,
   ): Promise<PolicyIngestRun> {
-    const { data, error } = await this.client
+    const primary = await this.client
       .from("policy_ingest_runs")
       .update(input)
       .eq("id", id)
       .select("*")
       .single();
-    throwIfError("update policy ingest run", error);
-    return data as PolicyIngestRun;
+
+    if (
+      primary.error &&
+      /auto_published|drafts_retained|drafts_cleaned/i.test(
+        primary.error.message,
+      )
+    ) {
+      const {
+        auto_published: _a,
+        drafts_retained: _b,
+        drafts_cleaned: _c,
+        ...legacy
+      } = input;
+      const fallback = await this.client
+        .from("policy_ingest_runs")
+        .update(legacy)
+        .eq("id", id)
+        .select("*")
+        .single();
+      throwIfError("update policy ingest run", fallback.error);
+      return {
+        ...(fallback.data as PolicyIngestRun),
+        auto_published: _a ?? 0,
+        drafts_retained: _b ?? 0,
+        drafts_cleaned: _c ?? 0,
+      };
+    }
+
+    throwIfError("update policy ingest run", primary.error);
+    return primary.data as PolicyIngestRun;
   }
 
   async createSkip(input: CreatePolicyIngestSkipInput): Promise<PolicyIngestSkip> {
@@ -136,5 +175,45 @@ export class PolicyIngestRepository {
       .maybeSingle();
     throwIfError("find signal by document_id", error);
     return data as { id: string } | null;
+  }
+
+  async listAiDraftSignals(): Promise<
+    Array<{
+      id: string;
+      title: string | null;
+      source_url: string | null;
+      content_hash: string | null;
+      event_date: string | null;
+      created_at: string;
+    }>
+  > {
+    const { data, error } = await this.client
+      .from("signals")
+      .select("id,title,source_url,content_hash,event_date,created_at")
+      .eq("review_status", "ai_draft")
+      .eq("is_demo", false)
+      .order("created_at", { ascending: false })
+      .limit(2_000);
+    throwIfError("list ai_draft signals", error);
+    return (data ?? []) as Array<{
+      id: string;
+      title: string | null;
+      source_url: string | null;
+      content_hash: string | null;
+      event_date: string | null;
+      created_at: string;
+    }>;
+  }
+
+  async deleteAiDraftsByIds(ids: string[]): Promise<number> {
+    if (!ids.length) return 0;
+    const { data, error } = await this.client
+      .from("signals")
+      .delete()
+      .in("id", ids)
+      .eq("review_status", "ai_draft")
+      .select("id");
+    throwIfError("delete ai_draft signals", error);
+    return data?.length ?? 0;
   }
 }

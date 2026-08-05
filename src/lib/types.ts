@@ -51,22 +51,34 @@ export interface Signal {
   region_id: string | null;
   signal_type: SignalType;
   title: string | null;
+  /** Short lead / one-paragraph abstract. */
   summary: string | null;
+  /** Fuller policy main text / key points (distinct from summary). */
+  body: string | null;
   category: string | null;
   original_status: string | null;
   normalized_status: NormalizedStatus | null;
   event_date: string | null;
   effective_date: string | null;
+  /** Policy expiry / repeal date when known. */
+  expires_at: string | null;
   impact_channel: string | null;
   impact_direction: string | null;
   impact_level: string | null;
   source_url: string | null;
+  /** Feed / site label for the source page. */
   source_name: string | null;
+  /** Issuing agency or authority (may differ from source_name). */
+  issuer: string | null;
   reviewer_note: string | null;
   review_status: ReviewStatus;
+  /** Explicit queue flag for drafts that still need a human. */
+  needs_human_review: boolean;
   published_at: string | null;
   created_at: string;
   updated_at: string;
+  /** When the source document was fetched / ingested. */
+  crawled_at: string | null;
   is_demo: boolean;
   reviewer_id?: string | null;
   reviewed_at: string | null;
@@ -78,6 +90,10 @@ export interface Signal {
   ai_importance?: number | null;
   /** Official document / docket / file number when known. */
   document_id?: string | null;
+  /** Dual-track label from AI ingest (persisted). */
+  policy_track?: "storage_power_market" | "esg" | "both" | "none" | null;
+  /** High-impact star; drives public （***） marker with auto-publish threshold. */
+  star_mark?: boolean;
 }
 
 export interface MarketMetric {

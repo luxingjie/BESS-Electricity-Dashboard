@@ -27,7 +27,7 @@ export function RunPolicyIngestButton() {
       }
       const run = payload?.data?.run;
       setMessage(
-        `完成：草稿 ${run?.drafts_created ?? 0} · 跳过 ${run?.skips_recorded ?? 0} · 候选 ${run?.candidates_seen ?? 0}`,
+        `完成：自动发布 ${run?.auto_published ?? payload?.data?.published_ids?.length ?? 0} · 草稿 ${run?.drafts_retained ?? payload?.data?.draft_ids?.length ?? 0} · 清理 ${run?.drafts_cleaned ?? payload?.data?.drafts_cleaned ?? 0} · 跳过 ${run?.skips_recorded ?? 0}`,
       );
       router.refresh();
     } catch (error) {

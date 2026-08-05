@@ -33,6 +33,8 @@ npm run dev
 NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<local anon key>
 OPENAI_API_KEY=<server-only OpenAI key>
+CRON_SECRET=<server-only Bearer secret for /api/cron/policy-ingest>
+SUPABASE_SERVICE_ROLE_KEY=<local service-role key; cron writes only>
 # 可选，默认 gpt-5.6-terra
 OPENAI_MODEL=gpt-5.6-terra
 ```

@@ -37,19 +37,29 @@ const PUBLIC_SIGNAL_COLUMNS = [
   "signal_type",
   "title",
   "summary",
+  "body",
   "category",
+  "policy_track",
+  "star_mark",
   "original_status",
   "normalized_status",
   "event_date",
   "effective_date",
+  "expires_at",
   "impact_channel",
   "impact_direction",
   "impact_level",
   "source_url",
   "source_name",
+  "issuer",
+  "document_id",
+  "ai_importance",
+  "needs_human_review",
   "reviewer_note",
   "review_status",
   "published_at",
+  "reviewed_at",
+  "crawled_at",
   "is_demo",
   "created_at",
   "updated_at",
@@ -95,7 +105,16 @@ function matchesSearch(signal: Signal, search?: string) {
   const needle = search?.trim().toLocaleLowerCase("zh-CN");
   if (!needle) return true;
 
-  return [signal.title, signal.summary, signal.category, signal.original_status, signal.source_name]
+  return [
+    signal.title,
+    signal.summary,
+    signal.body,
+    signal.category,
+    signal.original_status,
+    signal.source_name,
+    signal.issuer,
+    signal.document_id,
+  ]
     .filter((value): value is string => Boolean(value))
     .some((value) => value.toLocaleLowerCase("zh-CN").includes(needle));
 }

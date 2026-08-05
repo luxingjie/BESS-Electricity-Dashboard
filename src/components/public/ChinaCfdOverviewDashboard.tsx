@@ -201,6 +201,7 @@ export function ChinaCfdOverviewDashboard({
 
   return (
     <section
+      id="china-cfd-overview"
       className={styles.dashboard}
       aria-labelledby="china-cfd-overview-title"
     >

@@ -16,6 +16,37 @@ const COMMENTARY_PATTERNS = [
   /weekly\s+round.?up/i,
   /analyst\s+note/i,
   /blog\b/i,
+  /行业分析/i,
+  /深度分析/i,
+];
+
+/** Noise that should never enter the public policy feed. */
+const EXCLUDE_NOISE_PATTERNS = [
+  /融资/i,
+  /上市/i,
+  /IPO/i,
+  /中标/i,
+  /招标/i,
+  /投标/i,
+  /采购公告/i,
+  /人物访谈/i,
+  /专访/i,
+  /展会/i,
+  /论坛通知/i,
+  /价格指数/i,
+  /企业动态/i,
+  /签约仪式/i,
+  /历史回顾/i,
+  /往年/i,
+  /复盘/i,
+  /年度盘点/i,
+  /year[- ]?in[- ]?review/i,
+  /retrospective/i,
+  /tender\b/i,
+  /rfp\b/i,
+  /awarded\s+contract/i,
+  /funding\s+round/i,
+  /exhibition/i,
 ];
 
 const POLICY_HINT_PATTERNS = [
@@ -41,6 +72,11 @@ const POLICY_HINT_PATTERNS = [
   /resolu[cç][aã]o/i,
   /acuerdo/i,
   /normativa/i,
+  /标准/i,
+  /disclosure/i,
+  /CBAM/i,
+  /ETS/i,
+  /CCER/i,
 ];
 
 const SCOPE_HINT_PATTERNS = [
@@ -56,6 +92,14 @@ const SCOPE_HINT_PATTERNS = [
   /机制电价/i,
   /可再生/i,
   /风光/i,
+  /配储/i,
+  /构网/i,
+  /绿证/i,
+  /碳市场/i,
+  /碳足迹/i,
+  /碳关税/i,
+  /气候披露/i,
+  /电池回收/i,
   /battery/i,
   /storage/i,
   /bess/i,
@@ -68,11 +112,19 @@ const SCOPE_HINT_PATTERNS = [
   /renewable/i,
   /tariff/i,
   /power\s+market/i,
+  /ESG/i,
+  /CBAM/i,
+  /carbon/i,
+  /EPR/i,
 ];
 
 export type HardFilterDecision =
   | { accept: true }
-  | { accept: false; reason: "commentary" | "not_policy" | "out_of_scope"; detail: string };
+  | {
+      accept: false;
+      reason: "commentary" | "not_policy" | "out_of_scope";
+      detail: string;
+    };
 
 export function classifyCandidateTitle(
   candidate: Pick<PolicyListCandidate, "title">,
@@ -80,6 +132,14 @@ export function classifyCandidateTitle(
   const title = candidate.title.trim();
   if (!title) {
     return { accept: false, reason: "not_policy", detail: "空标题" };
+  }
+
+  if (EXCLUDE_NOISE_PATTERNS.some((pattern) => pattern.test(title))) {
+    return {
+      accept: false,
+      reason: "out_of_scope",
+      detail: "标题命中企业动态/招标/展会/历史回顾等排除类",
+    };
   }
 
   if (COMMENTARY_PATTERNS.some((pattern) => pattern.test(title))) {
@@ -99,7 +159,7 @@ export function classifyCandidateTitle(
     return {
       accept: false,
       reason: "out_of_scope",
-      detail: "标题缺少政策形态与储能/电力市场相关线索",
+      detail: "标题缺少政策形态与储能/电力市场/ESG 相关线索",
     };
   }
 

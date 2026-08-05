@@ -4,6 +4,7 @@ import {
   buildPolicyExportRows,
   isHighImpactPolicy,
   policyRowsToMarkdown,
+  policyRowsToWordHtml,
 } from "@/lib/export/policy-signals";
 import type { Region, Signal } from "@/lib/types";
 
@@ -78,21 +79,26 @@ function signal(
   return {
     signal_type: "policy",
     summary: "影响摘要",
+    body: null,
     category: "容量电价",
     original_status: null,
     normalized_status: "effective",
     event_date: "2026-07-01",
     effective_date: null,
+    expires_at: null,
     impact_channel: null,
     impact_direction: null,
     impact_level: null,
     source_url: "https://example.com/p",
     source_name: "发改委",
+    issuer: "发改委",
     reviewer_note: "已核",
+    needs_human_review: false,
     review_status: "published",
     published_at: now,
     created_at: now,
     updated_at: now,
+    crawled_at: now,
     is_demo: true,
     reviewed_at: now,
     ...partial,
@@ -116,7 +122,30 @@ describe("policy monthly-report export shape", () => {
       regionsById,
     );
 
-    expect(isHighImpactPolicy(rows[0] as unknown as Signal)).toBe(false);
+    expect(
+      isHighImpactPolicy({
+        title: "国家级通知",
+        impact_level: "high",
+        star_mark: false,
+        ai_importance: 0.7,
+      } as Signal),
+    ).toBe(true);
+    expect(
+      isHighImpactPolicy({
+        title: "普通政策",
+        impact_level: null,
+        star_mark: false,
+        ai_importance: 0.69,
+      } as Signal),
+    ).toBe(false);
+    expect(
+      isHighImpactPolicy({
+        title: "星标政策",
+        impact_level: null,
+        star_mark: true,
+        ai_importance: 0.55,
+      } as Signal),
+    ).toBe(true);
     expect(rows[0]?.importance_mark).toBe("***");
     expect(rows[0]?.section).toBe("domestic_national");
     expect(rows[1]?.section).toBe("domestic_regional");
@@ -135,5 +164,17 @@ describe("policy monthly-report export shape", () => {
     expect(markdown).toContain("欧洲");
     expect(markdown).toContain("（***）国家级通知");
     expect(markdown).not.toContain("Key Takeaways");
+
+    const word = policyRowsToWordHtml(rows, {
+      from: "2026-06-12",
+      to: "2026-07-12",
+      regionLabel: "全球（全部）",
+    });
+    expect(word).toContain("urn:schemas-microsoft-com:office:word");
+    expect(word).toContain("储能与 ESG 政策动态");
+    expect(word).toContain("<h2>国内相关政策</h2>");
+    expect(word).toContain("<h2>国家政策</h2>");
+    expect(word).toContain("<h2>欧洲</h2>");
+    expect(word).toContain("（***）国家级通知");
   });
 });

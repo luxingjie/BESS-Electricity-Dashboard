@@ -51,6 +51,9 @@ export interface PolicyIngestRun {
   feeds_scanned: number;
   candidates_seen: number;
   drafts_created: number;
+  auto_published?: number;
+  drafts_retained?: number;
+  drafts_cleaned?: number;
   skips_recorded: number;
   error_message: string | null;
   created_by: string | null;
@@ -78,7 +81,9 @@ export interface PolicyListCandidate {
 export interface PolicyAiDraft {
   title_zh: string;
   summary_zh: string;
+  body_zh: string;
   document_id: string | null;
+  issuer: string | null;
   normalized_status:
     | "draft"
     | "consultation"
@@ -89,7 +94,13 @@ export interface PolicyAiDraft {
     | "other"
     | null;
   event_date: string | null;
+  effective_date: string | null;
+  expires_at: string | null;
   category: string | null;
+  /** Dual-track label: storage/power market, ESG, both, or none (reject). */
+  policy_track: "storage_power_market" | "esg" | "both" | "none";
+  /** High-impact star (*) for BESS commercial / mandatory / market-access effects. */
+  star_mark: boolean;
   importance: number;
   is_formal_policy: boolean;
   is_commentary: boolean;

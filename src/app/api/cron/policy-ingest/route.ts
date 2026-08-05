@@ -3,8 +3,8 @@ import { NextResponse } from "next/server";
 import { errorResponse } from "@/lib/http/errors";
 import { OpenAiPolicyExtractor } from "@/lib/policy-ingest/ai";
 import {
+  POLICY_INGEST_DAILY_CAP,
   POLICY_INGEST_LOOKBACK_DAYS,
-  POLICY_INGEST_WEEKLY_CAP,
 } from "@/lib/policy-ingest/config";
 import { PolicyIngestRepository } from "@/lib/policy-ingest/repository";
 import { PolicyIngestService } from "@/lib/policy-ingest/service";
@@ -39,7 +39,7 @@ function assertCronAuthorized(request: Request) {
   }
 }
 
-async function runWeeklyIngest() {
+async function runDailyIngest() {
   const client = createServiceSupabaseClient();
   const service = new PolicyIngestService(
     new PolicyIngestRepository(client),
@@ -52,18 +52,20 @@ async function runWeeklyIngest() {
     trigger: "cron",
     actorId: null,
     lookbackDays: POLICY_INGEST_LOOKBACK_DAYS,
-    weeklyCap: POLICY_INGEST_WEEKLY_CAP,
+    dailyCap: POLICY_INGEST_DAILY_CAP,
   });
 }
 
 export async function GET(request: Request) {
   try {
     assertCronAuthorized(request);
-    const result = await runWeeklyIngest();
+    const result = await runDailyIngest();
     return NextResponse.json({
       data: {
         run: result.run,
         draft_ids: result.draftIds,
+        published_ids: result.publishedIds,
+        drafts_cleaned: result.draftsCleaned,
       },
     });
   } catch (error) {
@@ -74,11 +76,13 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     assertCronAuthorized(request);
-    const result = await runWeeklyIngest();
+    const result = await runDailyIngest();
     return NextResponse.json({
       data: {
         run: result.run,
         draft_ids: result.draftIds,
+        published_ids: result.publishedIds,
+        drafts_cleaned: result.draftsCleaned,
       },
     });
   } catch (error) {

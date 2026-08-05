@@ -30,12 +30,59 @@
   letter-spacing: -0.03em;
 }
 
-.header p {
+.header p,
+.legend {
   max-width: 640px;
   margin: 8px 0 0;
   color: #556159;
   font-size: 13px;
   line-height: 1.65;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.legendTip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: help;
+  outline: none;
+}
+
+.legendTipBubble {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 8px);
+  z-index: 5;
+  width: min(320px, 70vw);
+  padding: 10px 12px;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  border-radius: 10px;
+  color: #334038;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(17, 17, 17, 0.1);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.55;
+  text-transform: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition: opacity 120ms ease, transform 120ms ease, visibility 120ms ease;
+  pointer-events: none;
+}
+
+.legendTip:hover .legendTipBubble,
+.legendTip:focus-visible .legendTipBubble {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
 
 .count {
@@ -201,10 +248,12 @@
   font-size: 10px;
 }
 
-.impact {
+.impact,
+.impactInline {
   display: inline-flex;
   align-items: center;
-  padding: 2px 7px;
+  gap: 4px;
+  padding: 2px 7px 2px 5px;
   border: 1px solid rgba(0, 130, 52, 0.35);
   border-radius: 999px;
   color: var(--gl-signal-deep, #008234);
@@ -213,6 +262,19 @@
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.04em;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.impact :global(.gl-high-impact-icon),
+.impactInline :global(.gl-high-impact-icon) {
+  display: block;
+  flex: 0 0 auto;
+}
+
+.impact :global(.gl-high-impact-label),
+.impactInline :global(.gl-high-impact-label) {
+  text-transform: uppercase;
 }
 
 .tags {

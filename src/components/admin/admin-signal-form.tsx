@@ -44,16 +44,20 @@ export function AdminSignalForm({ regions, signal }: Props) {
       signal_type: String(data.get("signal_type") ?? "policy"),
       title: String(data.get("title") ?? ""),
       summary: String(data.get("summary") ?? ""),
+      body: String(data.get("body") ?? ""),
       category: String(data.get("category") ?? ""),
       original_status: String(data.get("original_status") ?? ""),
       normalized_status: String(data.get("normalized_status") ?? "") || null,
       event_date: String(data.get("event_date") ?? ""),
       effective_date: String(data.get("effective_date") ?? ""),
+      expires_at: String(data.get("expires_at") ?? ""),
       impact_channel: String(data.get("impact_channel") ?? ""),
       impact_direction: String(data.get("impact_direction") ?? ""),
       impact_level: String(data.get("impact_level") ?? ""),
       source_url: String(data.get("source_url") ?? ""),
       source_name: String(data.get("source_name") ?? ""),
+      issuer: String(data.get("issuer") ?? ""),
+      document_id: String(data.get("document_id") ?? ""),
       reviewer_note: String(data.get("reviewer_note") ?? ""),
       is_demo: data.get("is_demo") === "on",
     };
@@ -132,11 +136,19 @@ export function AdminSignalForm({ regions, signal }: Props) {
         </label>
         <label className="span-2">
           <span>摘要 *</span>
-          <textarea name="summary" rows={5} defaultValue={signal?.summary ?? ""} placeholder="只写已核实内容与明确边界" />
+          <textarea name="summary" rows={3} defaultValue={signal?.summary ?? ""} placeholder="1–3 句短导语" />
+        </label>
+        <label className="span-2">
+          <span>正文 / 主要内容</span>
+          <textarea name="body" rows={8} defaultValue={signal?.body ?? ""} placeholder="政策要点、适用范围、关键义务与时间节点" />
         </label>
         <label>
-          <span>分类</span>
-          <input name="category" defaultValue={signal?.category ?? ""} placeholder="如：现货市场" />
+          <span>分类 / 政策类型</span>
+          <input name="category" defaultValue={signal?.category ?? ""} placeholder="如：储能与电力市场政策" />
+        </label>
+        <label>
+          <span>文号</span>
+          <input name="document_id" defaultValue={signal?.document_id ?? ""} placeholder="如：发改能源〔2026〕1号" />
         </label>
         <label>
           <span>原始状态</span>
@@ -158,6 +170,10 @@ export function AdminSignalForm({ regions, signal }: Props) {
           <input name="effective_date" type="date" defaultValue={dateInput(signal?.effective_date)} />
         </label>
         <label>
+          <span>失效日期</span>
+          <input name="expires_at" type="date" defaultValue={dateInput(signal?.expires_at)} />
+        </label>
+        <label>
           <span>影响渠道</span>
           <input name="impact_channel" defaultValue={signal?.impact_channel ?? ""} placeholder="收益 / 成本 / 需求 / 进度" />
         </label>
@@ -175,7 +191,11 @@ export function AdminSignalForm({ regions, signal }: Props) {
         </label>
         <label>
           <span>来源名称</span>
-          <input name="source_name" defaultValue={signal?.source_name ?? ""} />
+          <input name="source_name" defaultValue={signal?.source_name ?? ""} placeholder="站点 / 栏目名" />
+        </label>
+        <label>
+          <span>发布机构</span>
+          <input name="issuer" defaultValue={signal?.issuer ?? ""} placeholder="发文机关正式名称" />
         </label>
         <label className="span-2">
           <span>人工确认信息 *</span>

@@ -2,7 +2,7 @@
  * Aligned with Jinko ESS「储能与 ESG 政策月报」栏目结构（中文正文）。
  * 样本：4.11–5.10 / 5.11–6.12 / 6.12–7.12 三期月报。
  *
- * 导出由 `policyRowsToMarkdown` / `policyRowsToCsv` 生成。
+ * 导出由 `policyRowsToWordHtml` / `policyRowsToMarkdown` / `policyRowsToCsv` 生成。
  */
 export const POLICY_BRIEF_TEMPLATE_SECTIONS = [
   "说明：（***）重要影响；跳过纯鼓励/低重要性；中国政策仅中文",

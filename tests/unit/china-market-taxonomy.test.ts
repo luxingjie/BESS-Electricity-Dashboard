@@ -81,13 +81,20 @@ describe("China provincial market atlas taxonomy", () => {
   });
 
   it("keeps the database topic/field allow-list aligned with the shared taxonomy", () => {
+    // Initial seven-topic module plus follow-up enum/field migrations for
+    // renewable-mechanism-price (Postgres cannot add + use an enum in one txn).
     const migrationHistory = [
-      "../../supabase/migrations/202607240001_china_province_topic_module.sql",
-      "../../supabase/migrations/202607280001_add_renewable_mechanism_price_topic.sql",
-      "../../supabase/migrations/202607280002_renewable_mechanism_price_topic_validation.sql",
+      "202607240001_china_province_topic_module.sql",
+      "202607280001_add_renewable_mechanism_price_topic.sql",
+      "202607280002_renewable_mechanism_price_topic_validation.sql",
     ]
-      .map((path) =>
-        readFileSync(fileURLToPath(new URL(path, import.meta.url)), "utf8"),
+      .map((name) =>
+        readFileSync(
+          fileURLToPath(
+            new URL(`../../supabase/migrations/${name}`, import.meta.url),
+          ),
+          "utf8",
+        ),
       )
       .join("\n");
 

@@ -51,7 +51,7 @@ export class SignalService {
 
   /**
    * Creates or updates a manually entered draft. Manual entries use
-   * pending_review; ai_draft is reserved for weekly policy ingest.
+   * pending_review; ai_draft is reserved for daily policy ingest below auto-publish threshold.
    */
   async saveDraft(
     actor: Actor | null | undefined,
@@ -76,6 +76,7 @@ export class SignalService {
 
       const patch: UpdateSignalRecord = {
         ...draftFields,
+        needs_human_review: result.data.needs_human_review ?? true,
         review_status: "pending_review",
         published_at: null,
         reviewer_id: null,
@@ -91,21 +92,29 @@ export class SignalService {
       signal_type: result.data.signal_type ?? "policy",
       title: result.data.title ?? null,
       summary: result.data.summary ?? null,
+      body: result.data.body ?? null,
       category: result.data.category ?? null,
+      policy_track: null,
+      star_mark: false,
       original_status: result.data.original_status ?? null,
       normalized_status: result.data.normalized_status ?? null,
       event_date: result.data.event_date ?? null,
       effective_date: result.data.effective_date ?? null,
+      expires_at: result.data.expires_at ?? null,
       impact_channel: result.data.impact_channel ?? null,
       impact_direction: result.data.impact_direction ?? null,
       impact_level: result.data.impact_level ?? null,
       source_url: result.data.source_url ?? null,
       source_name: result.data.source_name ?? null,
+      issuer: result.data.issuer ?? result.data.source_name ?? null,
+      document_id: result.data.document_id ?? null,
       reviewer_note: result.data.reviewer_note ?? null,
+      needs_human_review: result.data.needs_human_review ?? true,
       review_status: "pending_review",
       published_at: null,
       created_at: now,
       updated_at: now,
+      crawled_at: now,
       is_demo: result.data.is_demo ?? false,
       reviewer_id: null,
       reviewed_at: null,
@@ -132,6 +141,7 @@ export class SignalService {
     const now = this.clock().toISOString();
     return this.repository.update(signalId, {
       review_status: "published",
+      needs_human_review: false,
       reviewer_note: reviewerNote.trim(),
       reviewer_id: admin.id,
       reviewed_at: now,
@@ -162,6 +172,7 @@ export class SignalService {
     const now = this.clock().toISOString();
     return this.repository.update(signalId, {
       review_status: "rejected",
+      needs_human_review: false,
       reviewer_note: result.data.reviewer_note,
       reviewer_id: admin.id,
       reviewed_at: now,
