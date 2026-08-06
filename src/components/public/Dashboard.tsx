@@ -69,10 +69,6 @@ function regionName(region: Region | undefined): string {
   return region?.name_zh || region?.name_en || region?.code || "未命名地区";
 }
 
-function regionCode(region: Region): string {
-  return region.code || region.name_en || region.region_type;
-}
-
 function scopedRegionIds(regions: Region[], activeRegion?: Region | null): Set<string> | null {
   if (!activeRegion || activeRegion.region_type === "global") return null;
   return descendantRegionIds(regions, activeRegion.id);
@@ -348,33 +344,36 @@ export function Dashboard({
   marketMetrics,
   provinceTopics,
   cfdAuctions = [],
-  projectEvents = [],
   activeRegion,
   activeModule = "policy",
   searchQuery = "",
   searchAction,
   getRegionHref = defaultRegionHref,
-  getSignalHref = defaultSignalHref,
 }: DashboardProps) {
   // Soft-switch modules in the client so tab clicks don't re-fetch the whole
   // dashboard RSC payload (each route is force-dynamic + Supabase).
-  const [currentModule, setCurrentModule] = useState<DashboardModule>(activeModule);
-
-  useEffect(() => {
-    setCurrentModule(activeModule);
-  }, [activeModule, activeRegion?.id]);
+  const moduleStateKey = `${activeRegion?.id ?? "global"}:${activeModule}`;
+  const [moduleState, setModuleState] = useState<{
+    key: string;
+    module: DashboardModule;
+  }>({ key: moduleStateKey, module: activeModule });
+  const currentModule =
+    moduleState.key === moduleStateKey ? moduleState.module : activeModule;
 
   useEffect(() => {
     const onPopState = () => {
-      setCurrentModule(dashboardModuleFromPathname(window.location.pathname));
+      setModuleState({
+        key: moduleStateKey,
+        module: dashboardModuleFromPathname(window.location.pathname),
+      });
     };
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
-  }, []);
+  }, [moduleStateKey]);
 
   const switchModule = (module: DashboardModule, href: string) => {
     if (module === currentModule) return;
-    setCurrentModule(module);
+    setModuleState({ key: moduleStateKey, module });
     // Replace (don't push) so Back returns to the previous place/region,
     // not every intermediate module click.
     window.history.replaceState({ module }, "", href);

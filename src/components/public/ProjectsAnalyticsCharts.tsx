@@ -24,7 +24,7 @@ function bucketValue(bucket: AnalyticsBucket, unit: AnalyticsUnit): number {
   return raw / 1000;
 }
 
-function formatUnitValue(value: number, unit: AnalyticsUnit): string {
+function formatUnitValue(value: number): string {
   if (!Number.isFinite(value) || value <= 0) return "0";
   if (value >= 100) return value.toFixed(0);
   if (value >= 10) return value.toFixed(1);
@@ -34,7 +34,7 @@ function formatUnitValue(value: number, unit: AnalyticsUnit): string {
 
 function formatUnitLabel(value: number, unit: AnalyticsUnit): string {
   const suffix = unit === "gw" ? "GW" : "GWh";
-  return `${formatUnitValue(value, unit)} ${suffix}`;
+  return `${formatUnitValue(value)} ${suffix}`;
 }
 
 function shortMonthLabel(key: string): string {
@@ -98,7 +98,7 @@ function BarChart({
                 <i style={{ width: `${(value / max) * 100}%` }} />
               </span>
               <span className="gl-projects-hbar-value">
-                {formatUnitValue(value, unit)}
+                {formatUnitValue(value)}
               </span>
             </li>
           ))}
@@ -116,7 +116,7 @@ function BarChart({
               title={`${bucket.label}：${formatUnitLabel(value, unit)} · ${bucket.count} 条`}
             >
               <span className="gl-projects-vbar-value">
-                {formatUnitValue(value, unit)}
+                {formatUnitValue(value)}
               </span>
               <span className="gl-projects-vbar-track">
                 <i style={{ height: `${(value / max) * 100}%` }} />

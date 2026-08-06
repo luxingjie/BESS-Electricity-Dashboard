@@ -307,25 +307,19 @@ export function ProjectsTendersPanel({
   const pageItems = payload?.items ?? [];
   const listSelected =
     pageItems.find((event) => event.id === selectedId) ?? pageItems[0] ?? null;
+  const selectedAwardId =
+    listSelected?.event_type === "award" ? listSelected.id : null;
 
   useEffect(() => {
-    if (!listSelected) {
-      setDetailEvent(null);
-      return;
-    }
-
-    // Awards need full candidate list; other types use the list row as-is.
-    if (listSelected.event_type !== "award") {
-      setDetailEvent(listSelected);
-      return;
-    }
+    // Awards need full candidate lists; all other rows render list data directly.
+    if (!selectedAwardId) return;
 
     const controller = new AbortController();
     async function loadDetail() {
       setDetailLoading(true);
       try {
         const response = await fetch(
-          `/api/public/project-events/${listSelected!.id}`,
+          `/api/public/project-events/${selectedAwardId}`,
           { signal: controller.signal },
         );
         if (!response.ok) throw new Error(`detail ${response.status}`);
@@ -333,14 +327,14 @@ export function ProjectsTendersPanel({
         setDetailEvent(json.data);
       } catch (loadError) {
         if ((loadError as Error).name === "AbortError") return;
-        setDetailEvent(listSelected);
+        setDetailEvent(null);
       } finally {
         setDetailLoading(false);
       }
     }
     void loadDetail();
     return () => controller.abort();
-  }, [listSelected?.id, listSelected?.event_type]);
+  }, [selectedAwardId]);
 
   // Track bar counts follow list filters, not the analytics window.
   const counts = payload?.counts ?? {
@@ -350,7 +344,11 @@ export function ProjectsTendersPanel({
     commissioning: 0,
   };
   const pageCount = Math.max(1, Math.ceil((payload?.total ?? 0) / PAGE_SIZE));
-  const selected = detailEvent ?? listSelected;
+  const selected =
+    selectedAwardId && detailEvent?.id === selectedAwardId
+      ? detailEvent
+      : listSelected;
+  const selectedDetailLoading = Boolean(selectedAwardId && detailLoading);
   const sources = payload?.sources ?? [];
 
   function resetPageFilters(updater: () => void) {
@@ -616,7 +614,7 @@ export function ProjectsTendersPanel({
                     {TRACK_LABEL[selected.event_type]}
                   </span>
                   <span>{selected.source_name}</span>
-                  {detailLoading ? <span>候选人加载中…</span> : null}
+                  {selectedDetailLoading ? <span>候选人加载中…</span> : null}
                 </div>
                 <h3>{selected.title}</h3>
                 <dl className="gl-projects-kv">

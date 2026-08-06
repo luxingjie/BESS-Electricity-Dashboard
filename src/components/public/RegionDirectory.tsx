@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { compareCountries } from "@/lib/region-order";
 import { descendantRegionIds } from "@/lib/regions/descendant-ids";
@@ -72,13 +72,15 @@ export function RegionSelector({
     ? policyBlocForCountrySlug(activeCountry.slug)
     : null;
 
-  const [expandedBlocKey, setExpandedBlocKey] = useState<DeskKey | null>(
-    activeBlocKey,
-  );
-
-  useEffect(() => {
-    if (activeBlocKey) setExpandedBlocKey(activeBlocKey);
-  }, [activeBlocKey]);
+  const scopeKey = activeRegionId ?? "global";
+  const [expandedState, setExpandedState] = useState<{
+    scopeKey: string;
+    blocKey: DeskKey | null;
+  }>({ scopeKey, blocKey: activeBlocKey });
+  const expandedBlocKey =
+    expandedState.scopeKey === scopeKey
+      ? expandedState.blocKey
+      : activeBlocKey;
 
   const countForRegion = (region: Region) => {
     const ids = descendantRegionIds(regions, region.id);
@@ -114,7 +116,10 @@ export function RegionSelector({
   );
 
   function toggleBloc(blocKey: DeskKey) {
-    setExpandedBlocKey((current) => (current === blocKey ? null : blocKey));
+    setExpandedState({
+      scopeKey,
+      blocKey: expandedBlocKey === blocKey ? null : blocKey,
+    });
   }
 
   return (

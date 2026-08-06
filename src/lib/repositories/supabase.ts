@@ -36,6 +36,14 @@ import type {
   Signal,
 } from "../types";
 
+interface PublicFilterBuilder {
+  eq(column: string, value: unknown): this;
+  gte(column: string, value: unknown): this;
+  lte(column: string, value: unknown): this;
+  in(column: string, values: ReadonlyArray<unknown>): this;
+  or(filters: string): this;
+}
+
 const PUBLIC_SIGNAL_COLUMNS = [
   "id",
   "region_id",
@@ -574,11 +582,11 @@ export class SupabaseBessProjectEventRepository
     };
   }
 
-  private applyPublicFilters<T extends Record<string, any>>(
+  private applyPublicFilters<T extends PublicFilterBuilder>(
     builder: T,
     query: PublicBessProjectEventQuery,
   ): T {
-    let next: any = builder;
+    let next = builder;
     if (query.event_type) next = next.eq("event_type", query.event_type);
     if (query.province_label) {
       next = next.eq("province_label", query.province_label);
@@ -607,7 +615,7 @@ export class SupabaseBessProjectEventRepository
         ].join(","),
       );
     }
-    return next as T;
+    return next;
   }
 
   async listPublicAnalytics(

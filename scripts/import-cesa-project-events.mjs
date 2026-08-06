@@ -429,7 +429,7 @@ async function main() {
         try {
           await client.query("begin");
           for (const event of group) {
-            const { tempId: _tempId, ...row } = event;
+            const row = event;
             await client.query(
               `insert into public.bess_project_events (
                 id, event_type, title, event_date, region_id, province_label, province_raw,
