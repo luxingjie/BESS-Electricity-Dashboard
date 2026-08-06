@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { isHttpUrl } from "@/lib/validation/http-url";
+
 import {
   NORMALIZED_STATUSES,
   REGION_TYPES,
@@ -24,23 +26,30 @@ const httpUrl = z
   .string()
   .trim()
   .url()
-  .refine((value) => {
-    const protocol = new URL(value).protocol;
-    return protocol === "http:" || protocol === "https:";
-  }, "Source URL must use HTTP or HTTPS");
+  .refine(isHttpUrl, "Source URL must use HTTP or HTTPS");
 
 const nullableUrl = z.preprocess(
   emptyStringToNull,
   httpUrl.nullable(),
 );
 
+const dateOnly = z
+  .string()
+  .trim()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must use YYYY-MM-DD")
+  .refine((value) => {
+    const [year, month, day] = value.split("-").map(Number);
+    const date = new Date(Date.UTC(year, month - 1, day));
+    return (
+      date.getUTCFullYear() === year &&
+      date.getUTCMonth() === month - 1 &&
+      date.getUTCDate() === day
+    );
+  }, "Invalid date");
+
 const nullableDate = z.preprocess(
   emptyStringToNull,
-  z
-    .string()
-    .trim()
-    .refine((value) => !Number.isNaN(Date.parse(value)), "Invalid date")
-    .nullable(),
+  dateOnly.nullable(),
 );
 
 export const regionTypeSchema = z.enum(REGION_TYPES);
@@ -51,7 +60,10 @@ export const normalizedStatusSchema = z.enum(NORMALIZED_STATUSES);
 /** Input accepted when an administrator saves an incomplete manual draft. */
 export const signalDraftInputSchema = z
   .object({
-    region_id: nullableText.optional(),
+    region_id: z.preprocess(
+      emptyStringToNull,
+      z.string().uuid("Region must be a UUID").nullable(),
+    ).optional(),
     signal_type: signalTypeSchema.optional(),
     title: nullableText.optional(),
     summary: nullableText.optional(),

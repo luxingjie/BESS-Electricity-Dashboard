@@ -73,6 +73,14 @@ try {
   const anonymousAdminApi = await json(`${appUrl}/api/admin/signals`);
   assert.equal(anonymousAdminApi.response.status, 401);
 
+  const malformedAdminMutation = await json(`${appUrl}/api/admin/signals`, {
+    method: "POST",
+    headers: bearerHeaders,
+    body: "{",
+  });
+  assert.equal(malformedAdminMutation.response.status, 422);
+  assert.equal(malformedAdminMutation.body?.error?.code, "INVALID_JSON");
+
   const authorizedAdminPage = await fetch(`${appUrl}/admin`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
@@ -156,7 +164,7 @@ try {
   const originalSource = await fetch(sourceUrl);
   assert.equal(originalSource.status, 200, "The original-source link should be visitable");
 
-  const provinceTopicTitle = `[DEMO] 山东七专题 HTTP E2E ${runId}`;
+  const provinceTopicTitle = `[DEMO] 山东八专题 HTTP E2E ${runId}`;
   const provinceTopicDraft = await json(`${appUrl}/api/admin/province-topics`, {
     method: "POST",
     headers: bearerHeaders,
@@ -164,7 +172,7 @@ try {
       region_id: shandong.id,
       topic_id: "trading-rules",
       title: provinceTopicTitle,
-      summary: "仅用于验证省级七专题录入、证据、审核发布和公开展示，不代表真实市场规则。",
+      summary: "仅用于验证省级八专题录入、证据、审核发布和公开展示，不代表真实市场规则。",
       legal_status: "effective",
       operational_status: "continuous",
       valid_from: "2026-01-01",

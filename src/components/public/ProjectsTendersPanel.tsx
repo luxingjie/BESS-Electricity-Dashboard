@@ -2,6 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+import type {
+  PublicProjectAnalyticsResponse,
+  PublicProjectEventResponse,
+  PublicProjectEventsResponse,
+} from "@/lib/api/contracts";
 import type { BessProjectAnalytics } from "@/lib/bess-projects/analytics";
 import {
   ANALYTICS_YEAR_OPTIONS,
@@ -13,8 +18,8 @@ import {
   yearBounds,
 } from "@/lib/bess-projects/period";
 import type {
-  BessProjectEvent,
   BessProjectEventType,
+  PublicBessProjectEvent,
   Region,
 } from "@/lib/types";
 import { ProjectsAnalyticsCharts } from "./ProjectsAnalyticsCharts";
@@ -49,21 +54,7 @@ const PLANT_OPTIONS = [
 
 const PAGE_SIZE = 15;
 
-type PagePayload = {
-  items: BessProjectEvent[];
-  total: number;
-  page: number;
-  page_size: number;
-  counts: {
-    all: number;
-    tender: number;
-    award: number;
-    commissioning: number;
-  };
-  sources: string[];
-};
-
-function scaleText(event: BessProjectEvent): string {
+function scaleText(event: PublicBessProjectEvent): string {
   if (event.scale_label) return event.scale_label;
   const power = formatNullableNumber(event.power_mw);
   const energy = formatNullableNumber(event.energy_mwh);
@@ -73,7 +64,7 @@ function scaleText(event: BessProjectEvent): string {
   return `${energy} MWh`;
 }
 
-function primaryCandidate(event: BessProjectEvent) {
+function primaryCandidate(event: PublicBessProjectEvent) {
   const candidates = event.candidates ?? [];
   return (
     candidates.find((item) => item.is_primary) ||
@@ -122,9 +113,12 @@ export function ProjectsTendersPanel({
   const [loading, setLoading] = useState(true);
   const [analyticsLoading, setAnalyticsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [payload, setPayload] = useState<PagePayload | null>(null);
+  const [payload, setPayload] = useState<
+    PublicProjectEventsResponse["data"] | null
+  >(null);
   const [analytics, setAnalytics] = useState<BessProjectAnalytics | null>(null);
-  const [detailEvent, setDetailEvent] = useState<BessProjectEvent | null>(null);
+  const [detailEvent, setDetailEvent] =
+    useState<PublicBessProjectEvent | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
 
   const provinceOptions = useMemo(() => {
@@ -232,7 +226,7 @@ export function ProjectsTendersPanel({
         if (!response.ok) {
           throw new Error(`加载失败（${response.status}）`);
         }
-        const json = (await response.json()) as { data: PagePayload };
+        const json = (await response.json()) as PublicProjectEventsResponse;
         setPayload(json.data);
         setSelectedId((current) => {
           const items = json.data.items;
@@ -285,7 +279,7 @@ export function ProjectsTendersPanel({
           { signal: controller.signal },
         );
         if (!response.ok) throw new Error(`analytics ${response.status}`);
-        const json = (await response.json()) as { data: BessProjectAnalytics };
+        const json = (await response.json()) as PublicProjectAnalyticsResponse;
         setAnalytics(json.data);
       } catch (loadError) {
         if ((loadError as Error).name === "AbortError") return;
@@ -323,7 +317,7 @@ export function ProjectsTendersPanel({
           { signal: controller.signal },
         );
         if (!response.ok) throw new Error(`detail ${response.status}`);
-        const json = (await response.json()) as { data: BessProjectEvent };
+        const json = (await response.json()) as PublicProjectEventResponse;
         setDetailEvent(json.data);
       } catch (loadError) {
         if ((loadError as Error).name === "AbortError") return;

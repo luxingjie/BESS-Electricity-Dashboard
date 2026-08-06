@@ -12,10 +12,10 @@ import {
 import { SignalService } from "@/lib/services/signal-service";
 import { ProvinceTopicService } from "@/lib/services/province-topic-service";
 import type {
-  BessProjectEvent,
   ChinaCfdAuction,
   MarketMetric,
   ProvinceTopicRecordWithFields,
+  PublicBessProjectEvent,
   Region,
   Signal,
 } from "@/lib/types";
@@ -27,52 +27,54 @@ export type PublicDashboardData = {
   marketMetrics: MarketMetric[];
   provinceTopics: ProvinceTopicRecordWithFields[];
   cfdAuctions: ChinaCfdAuction[];
-  projectEvents: BessProjectEvent[];
+  projectEvents: PublicBessProjectEvent[];
+};
+
+const UNCONFIGURED_DASHBOARD_DATA: PublicDashboardData = {
+  configured: false,
+  regions: [],
+  signals: [],
+  marketMetrics: [],
+  provinceTopics: [],
+  cfdAuctions: [],
+  projectEvents: [],
 };
 
 export async function getPublicDashboardData(): Promise<PublicDashboardData> {
   if (!getSupabaseConfig()) {
-    // Fallback: return mock data when Supabase is not configured
-    const { MOCK_DASHBOARD_DATA } = await import("./mock");
-    return MOCK_DASHBOARD_DATA;
+    return UNCONFIGURED_DASHBOARD_DATA;
   }
 
-  try {
-    const client = await createServerSupabaseClient();
-    const regionRepository = new SupabaseRegionRepository(client);
-    const signalService = new SignalService(new SupabaseSignalRepository(client));
-    const metricRepository = new SupabaseMarketMetricRepository(client);
-    const provinceTopicService = new ProvinceTopicService(
-      new SupabaseProvinceTopicRepository(client),
-    );
+  const client = await createServerSupabaseClient();
+  const regionRepository = new SupabaseRegionRepository(client);
+  const signalService = new SignalService(new SupabaseSignalRepository(client));
+  const metricRepository = new SupabaseMarketMetricRepository(client);
+  const provinceTopicService = new ProvinceTopicService(
+    new SupabaseProvinceTopicRepository(client),
+  );
 
-    const cfdAuctionRepository = new SupabaseCfdAuctionRepository(client);
+  const cfdAuctionRepository = new SupabaseCfdAuctionRepository(client);
 
-    // Project events are fetched on demand via /api/public/project-events
-    // (paginated). Do not embed the full table into every dashboard RSC payload.
-    const [regions, signals, marketMetrics, provinceTopics, cfdAuctions] =
-      await Promise.all([
-        regionRepository.list(),
-        signalService.listPublic(),
-        metricRepository.listPublic(),
-        provinceTopicService.listPublic(),
-        cfdAuctionRepository.listPublic(),
-      ]);
+  // Project events are fetched on demand via /api/public/project-events
+  // (paginated). Do not embed the full table into every dashboard RSC payload.
+  const [regions, signals, marketMetrics, provinceTopics, cfdAuctions] =
+    await Promise.all([
+      regionRepository.list(),
+      signalService.listPublic(),
+      metricRepository.listPublic(),
+      provinceTopicService.listPublic(),
+      cfdAuctionRepository.listPublic(),
+    ]);
 
-    return {
-      configured: true,
-      regions,
-      signals,
-      marketMetrics,
-      provinceTopics,
-      cfdAuctions,
-      projectEvents: [],
-    };
-  } catch {
-    // Fallback: return mock data when Supabase is unreachable
-    const { MOCK_DASHBOARD_DATA } = await import("./mock");
-    return MOCK_DASHBOARD_DATA;
-  }
+  return {
+    configured: true,
+    regions,
+    signals,
+    marketMetrics,
+    provinceTopics,
+    cfdAuctions,
+    projectEvents: [],
+  };
 }
 
 export async function getPublishedSignalDetail(id: string) {

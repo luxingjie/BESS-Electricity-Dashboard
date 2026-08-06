@@ -3,12 +3,12 @@ import { extname } from "node:path";
 import { NextResponse } from "next/server";
 
 import { requireAdminApi } from "@/lib/auth/admin";
-import { RequestValidationError } from "@/lib/validation/market-metric";
 import { errorResponse } from "@/lib/http/errors";
 import {
   assertTrustedJsonMutation,
   assertTrustedMultipartMutation,
 } from "@/lib/http/security";
+import { parseWithSchema, readJsonBody } from "@/lib/http/validation";
 import { createUrlImportSchema } from "@/lib/imports/schemas";
 import { ImportWorkflowError } from "@/lib/imports/service";
 import {
@@ -24,11 +24,6 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
-
-function validation<T>(result: { success: true; data: T } | { success: false; error: { flatten(): unknown } }): T {
-  if (!result.success) throw new RequestValidationError(result.error.flatten());
-  return result.data;
-}
 
 function emptyJobFields(adminId: string) {
   return {
@@ -92,7 +87,9 @@ export async function POST(request: Request) {
 
     if (contentType.startsWith("application/json")) {
       assertTrustedJsonMutation(request);
-      const payload = validation(createUrlImportSchema.safeParse(await request.json()));
+      const payload = parseWithSchema(
+        createUrlImportSchema.safeParse(await readJsonBody(request)),
+      );
       let normalizedUrl: string;
       try {
         normalizedUrl = normalizeImportUrl(payload.source_url);

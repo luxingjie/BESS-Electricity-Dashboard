@@ -1,11 +1,10 @@
 "use client";
 
 import type {
-  BessProjectEvent,
   ChinaCfdAuction,
   MarketMetric,
-  NormalizedStatus,
   ProvinceTopicRecordWithFields,
+  PublicBessProjectEvent,
   Region,
   Signal,
 } from "@/lib/types";
@@ -13,6 +12,10 @@ import Link from "next/link";
 import { useEffect, useState, type KeyboardEvent, type MouseEvent } from "react";
 
 import { descendantRegionIds } from "@/lib/regions/descendant-ids";
+import {
+  isPublishedSignal,
+  type PublishedSignal,
+} from "@/lib/domain/public-signal";
 import {
   DASHBOARD_MODULE_META,
   dashboardModuleFromPathname,
@@ -43,15 +46,6 @@ type RegionHref = (region: Region) => string;
 type SignalHref = (signal: Signal) => string;
 
 type DemoAware = { is_demo?: boolean };
-
-export type PublishedSignal = Signal & {
-  region_id: string;
-  title: string;
-  summary: string;
-  source_url: string;
-  normalized_status: NormalizedStatus;
-  reviewer_note: string;
-};
 
 function isDemo(record: unknown): boolean {
   return Boolean((record as DemoAware | null)?.is_demo);
@@ -104,19 +98,6 @@ function matchesSearch(
     .toLocaleLowerCase("zh-CN");
 
   return haystack.includes(query.toLocaleLowerCase("zh-CN"));
-}
-
-export function isPublishedSignal(signal: Signal): signal is PublishedSignal {
-  return (
-    signal.review_status === "published" &&
-    Boolean(signal.published_at) &&
-    Boolean(signal.region_id?.trim()) &&
-    Boolean(signal.title?.trim()) &&
-    Boolean(signal.summary?.trim()) &&
-    Boolean(signal.source_url?.trim()) &&
-    Boolean(signal.normalized_status) &&
-    Boolean(signal.reviewer_note?.trim())
-  );
 }
 
 function publishedSignalsOnly(signals: Signal[]): PublishedSignal[] {
@@ -328,7 +309,7 @@ export interface DashboardProps {
   marketMetrics: MarketMetric[];
   provinceTopics: ProvinceTopicRecordWithFields[];
   cfdAuctions?: ChinaCfdAuction[];
-  projectEvents?: BessProjectEvent[];
+  projectEvents?: PublicBessProjectEvent[];
   activeRegion?: Region | null;
   /** Content module shown under the shared hero (defaults to policy). */
   activeModule?: DashboardModule;

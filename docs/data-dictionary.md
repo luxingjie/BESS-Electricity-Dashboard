@@ -1,6 +1,6 @@
 # Grid Ledger MVP 数据字典
 
-本文档对应 `202607220001`—`202607220010` 迁移，包括 GL-MVP-001 正式表、地区目录，以及 GL-MVP-002 私有导入暂存、批准事务、Excel 行去重和受信任运维权限。对外读取边界由 PostgreSQL Row Level Security（RLS）强制，不仅依赖前端过滤。
+本文档对应当前仓库截至 `202608060002` 的迁移，包括 GL-MVP-001 正式表、地区目录、八专题、CfD、BESS 项目事件，以及 GL-MVP-002 私有导入暂存、批准事务、Excel 行去重和受信任运维权限。对外读取边界由 PostgreSQL Row Level Security（RLS）和必要的列级授权强制，不仅依赖前端过滤。
 
 ## 枚举
 
@@ -109,13 +109,13 @@ seed 中的市场指标仅为工程夹具：`is_demo = true`、`value = NULL`，
 
 ## `china_province_topic_records`
 
-中国省份 × 七大专题的审核发布单元。该表不保存通用事件，也不替代 `market_metrics`；它承载前端省级专题矩阵中一组字段共同的省份、专题、状态、有效期和主来源。
+中国省份 × 八大专题的审核发布单元。该表不保存通用事件，也不替代 `market_metrics`；它承载前端省级专题矩阵中一组字段共同的省份、专题、状态、有效期和主来源。
 
 | 字段 | 类型 | 必填 | 发布必填 | 说明 |
 | --- | --- | --- | --- | --- |
 | `id` | `uuid` | 是 | 是 | 主键 |
 | `region_id` | `uuid` | 是 | 是 | 必须是 `parent.code = CN` 的省级地区 |
-| `topic_id` | `province_topic_id` | 是 | 是 | 七大专题稳定 ID |
+| `topic_id` | `province_topic_id` | 是 | 是 | 八大专题稳定 ID |
 | `title` | `text` | 否 | 是 | 本次核验/发布记录标题 |
 | `summary` | `text` | 否 | 否 | 适用范围、口径和不能推断的事项 |
 | `legal_status` | `province_topic_legal_status` | 否 | 是 | 文件法律/政策状态 |
@@ -151,6 +151,20 @@ seed 中的市场指标仅为工程夹具：`is_demo = true`、`value = NULL`，
 
 缺失值必须使用 `NULL + coverage_status`，不能写成 0。原文明确为零时，`value_text = '0'` 且可同时保存 `value_numeric = 0`。
 
+## `china_cfd_auctions`
+
+中国省级风光机制电价竞价结果表。`region_id` 指向标准省级地区，`province_label` 可保留冀北/冀南、蒙东/蒙西等电网展示口径。价格、电量、认购率和期限均允许 `NULL`；`NULL` 表示未公布，不能转换为 0。只有 `is_published=true` 的记录可被公开读取。
+
+## `bess_project_events`
+
+储能招标、中标和并网事件表，`event_type` 为 `tender`、`award` 或 `commissioning`。`region_id` 可空：跨省或无法可靠映射的记录保留 `province_label='未知'`。功率、电量、时长、预算和单价均允许 `NULL`，且不允许前端把缺失值显示成 0。
+
+`source_batch`、`source_row_hash` 和 `raw` 只用于受信任导入的幂等、追踪与问题定位，不属于 Viewer API。匿名和普通登录用户在数据库列级授权上也不能读取这些字段。CESA 重导入以 `source_batch` 为单位在单一事务内替换；必须显式选择草稿或发布模式。
+
+## `bess_award_candidates`
+
+中标事件的候选人明细，通过 `event_id` 级联关联 `bess_project_events`。只有父事件已经发布时才允许公开读取候选人；Viewer DTO 不返回内部关联键和时间戳。
+
 ## `import_jobs`
 
 私有导入任务。保存输入类型、URL/文件名、私有 Storage 路径、MIME/大小、原文件与内容 SHA-256、提取文本、工作表预览/映射等 `input_metadata`、任务计数、失败阶段、用户错误、私有技术错误、重试标记以及创建人/时间。URL 使用 normalized/canonical/content hash 基础去重；PDF/XLSX/CSV 使用原文件 hash 去重。Excel/CSV 另有生成列 `workbook_source_key`，只对原文件名做大小写与首尾空白归一，用于保守界定“同源工作簿”。
@@ -174,4 +188,5 @@ bucket `grid-ledger-imports` 为 private。对象路径为 `{auth.uid()}/{import
 - `import_jobs`、`import_items` 和 `grid-ledger-imports` 对匿名及普通登录用户均不可读写；只有管理员可访问。
 - 管理员读写权限只认 JWT `app_metadata.role = 'admin'`；不读取用户可自行修改的 `user_metadata`。
 - `anon` 对 Signal 仅有公开列权限，不可直接读取 `reviewer_id` 或 `created_by`；Next Viewer API 同样使用显式 DTO 白名单。
+- `anon` 和普通 `authenticated` 对 BESS 项目事件只有公开业务列权限，不能读取 `source_batch`、`source_row_hash` 或 `raw`；候选人必须隶属于已发布父事件。
 - seed 不创建 Auth 用户或存储明文密码。管理员账号应在部署时由受信任的服务端流程创建，并将角色写入 `app_metadata`。

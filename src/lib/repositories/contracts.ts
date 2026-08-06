@@ -8,6 +8,7 @@ import type {
   Region,
   ReviewStatus,
   Signal,
+  PublicBessProjectEvent,
 } from "../types";
 import type { ChinaMarketTopicId } from "../china-market/taxonomy";
 
@@ -119,7 +120,7 @@ export interface PublicBessProjectEventQuery {
 }
 
 export type PublicBessProjectEventPage = {
-  items: BessProjectEvent[];
+  items: PublicBessProjectEvent[];
   total: number;
   page: number;
   page_size: number;
@@ -141,7 +142,7 @@ export interface BessProjectEventRepository {
   listPublicAnalytics(
     query?: PublicBessProjectEventQuery,
   ): Promise<PublicBessProjectAnalytics>;
-  getPublicById(id: string): Promise<BessProjectEvent | null>;
+  getPublicById(id: string): Promise<PublicBessProjectEvent | null>;
 }
 
 export interface ProvinceTopicRepository {

@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 
+import { emptyJsonObjectSchema } from "@/lib/api/contracts";
 import { requireAdminApi } from "@/lib/auth/admin";
 import { errorResponse } from "@/lib/http/errors";
 import { assertTrustedJsonMutation } from "@/lib/http/security";
+import { parseWithSchema, readJsonBody } from "@/lib/http/validation";
 import { OpenAiPolicyExtractor } from "@/lib/policy-ingest/ai";
 import { PolicyIngestRepository } from "@/lib/policy-ingest/repository";
 import { PolicyIngestService } from "@/lib/policy-ingest/service";
@@ -20,7 +22,9 @@ export async function POST(request: Request) {
   try {
     assertTrustedJsonMutation(request);
     const admin = await requireAdminApi();
-    await request.json().catch(() => ({}));
+    parseWithSchema(
+      emptyJsonObjectSchema.safeParse(await readJsonBody(request)),
+    );
 
     const client = await createServerSupabaseClient();
     const service = new PolicyIngestService(

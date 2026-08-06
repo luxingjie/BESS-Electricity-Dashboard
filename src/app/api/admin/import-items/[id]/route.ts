@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 
+import { parseApiUuidPath } from "@/lib/api/contracts";
 import { requireAdminApi } from "@/lib/auth/admin";
 import { errorResponse } from "@/lib/http/errors";
 import { assertTrustedJsonMutation } from "@/lib/http/security";
+import { RequestValidationError, readJsonBody } from "@/lib/http/validation";
 import {
   structuredImportDraftSchema,
   updateImportItemSchema,
@@ -10,7 +12,6 @@ import {
 import { ImportWorkflowError } from "@/lib/imports/service";
 import { SupabaseImportRepository } from "@/lib/imports/supabase-repository";
 import type { JsonObject } from "@/lib/imports/types";
-import { RequestValidationError } from "@/lib/validation/market-metric";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +23,7 @@ export async function PATCH(
   try {
     assertTrustedJsonMutation(request);
     await requireAdminApi();
-    const payload = updateImportItemSchema.safeParse(await request.json());
+    const payload = updateImportItemSchema.safeParse(await readJsonBody(request));
     if (!payload.success) throw new RequestValidationError(payload.error.flatten());
     const draft = structuredImportDraftSchema.safeParse(payload.data.draft_data);
     if (!draft.success) throw new RequestValidationError(draft.error.flatten());
@@ -33,7 +34,7 @@ export async function PATCH(
       );
     }
 
-    const { id } = await context.params;
+    const id = parseApiUuidPath((await context.params).id);
     const client = await createServerSupabaseClient();
     const repository = new SupabaseImportRepository(client);
     const existing = await repository.getItem(id);

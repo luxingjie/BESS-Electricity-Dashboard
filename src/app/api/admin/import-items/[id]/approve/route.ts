@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 
+import { parseApiUuidPath } from "@/lib/api/contracts";
 import { requireAdminApi } from "@/lib/auth/admin";
 import { errorResponse } from "@/lib/http/errors";
 import { assertTrustedJsonMutation } from "@/lib/http/security";
+import { RequestValidationError, readJsonBody } from "@/lib/http/validation";
 import { approveImportItemSchema } from "@/lib/imports/schemas";
 import {
   formalDraftData,
@@ -10,7 +12,6 @@ import {
 } from "@/lib/imports/service";
 import { SupabaseImportRepository } from "@/lib/imports/supabase-repository";
 import { assertImportDraftApprovable } from "@/lib/imports/validation";
-import { RequestValidationError } from "@/lib/validation/market-metric";
 import { SupabaseRegionRepository } from "@/lib/repositories/supabase";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
@@ -23,7 +24,7 @@ export async function POST(
   try {
     assertTrustedJsonMutation(request);
     await requireAdminApi();
-    const payload = approveImportItemSchema.safeParse(await request.json());
+    const payload = approveImportItemSchema.safeParse(await readJsonBody(request));
     if (!payload.success) throw new RequestValidationError(payload.error.flatten());
     if (payload.data.target_type === "unknown") {
       throw new ImportWorkflowError(
@@ -32,7 +33,7 @@ export async function POST(
       );
     }
 
-    const { id } = await context.params;
+    const id = parseApiUuidPath((await context.params).id);
     const client = await createServerSupabaseClient();
     const repository = new SupabaseImportRepository(client);
     const item = await repository.getItem(id);

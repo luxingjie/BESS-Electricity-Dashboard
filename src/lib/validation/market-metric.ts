@@ -1,13 +1,32 @@
 import { z } from "zod";
 
+import { isHttpUrl } from "@/lib/validation/http-url";
+
 const emptyToNull = (value: unknown) =>
   typeof value === "string" && value.trim() === "" ? null : value;
 
 const nullableText = z.preprocess(emptyToNull, z.string().trim().min(1).nullable());
-const nullableUrl = z.preprocess(emptyToNull, z.string().trim().url().nullable());
+const httpUrl = z
+  .string()
+  .trim()
+  .url()
+  .refine(isHttpUrl, "来源链接必须使用 HTTP 或 HTTPS");
+const nullableUrl = z.preprocess(emptyToNull, httpUrl.nullable());
+const dateOnly = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "日期必须为 YYYY-MM-DD")
+  .refine((value) => {
+    const [year, month, day] = value.split("-").map(Number);
+    const date = new Date(Date.UTC(year, month - 1, day));
+    return (
+      date.getUTCFullYear() === year &&
+      date.getUTCMonth() === month - 1 &&
+      date.getUTCDate() === day
+    );
+  }, "日期不存在");
 const nullableDate = z.preprocess(
   emptyToNull,
-  z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "日期必须为 YYYY-MM-DD").nullable(),
+  dateOnly.nullable(),
 );
 
 export const marketMetricCreateSchema = z.object({
@@ -23,20 +42,6 @@ export const marketMetricCreateSchema = z.object({
   notes: nullableText,
   is_demo: z.boolean(),
   is_published: z.boolean(),
-});
+}).strict();
 
 export const marketMetricUpdateSchema = marketMetricCreateSchema.partial();
-
-export class RequestValidationError extends Error {
-  readonly status = 422;
-  readonly code = "INVALID_INPUT";
-
-  constructor(readonly issues: unknown) {
-    super("请求字段不符合要求");
-  }
-}
-
-export function parseWithSchema<T>(result: z.ZodSafeParseResult<T>): T {
-  if (!result.success) throw new RequestValidationError(result.error.flatten());
-  return result.data;
-}

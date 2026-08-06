@@ -2,13 +2,14 @@ import type { Region, Signal } from "@/lib/types";
 import Link from "next/link";
 
 import { isHighImpactPolicy } from "@/lib/export/policy-signals";
+import { isPublishedSignal } from "@/lib/domain/public-signal";
 import {
   formatDate,
   formatOptionalText,
   normalizedStatusLabel,
 } from "./formatters";
 import { HighImpactMark, stripLegacyImpactPrefix } from "./HighImpactMark";
-import { isPublishedSignal, StatusPill } from "./Dashboard";
+import { StatusPill } from "./Dashboard";
 
 type DemoAware = { is_demo?: boolean };
 

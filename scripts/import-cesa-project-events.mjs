@@ -4,13 +4,15 @@
 // Usage:
 //   DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres \
 //   node scripts/import-cesa-project-events.mjs \
+//     --draft \
 //     "/path/to/招标.xlsx" \
 //     "/path/to/中标.xlsx" \
 //     "/path/to/并网.xlsx"
 //
-// Re-running deletes rows for each source_batch then inserts fresh published
-// rows. Unmapped / multi-province labels keep region_id null and
-// province_label = 「未知」.
+// Choose exactly one publication mode: --draft (safe default workflow) or
+// --publish (trusted operator has reviewed the source batch). Re-running
+// replaces each source_batch atomically. Unmapped / multi-province labels keep
+// region_id null and province_label = 「未知」.
 
 import { createHash, randomUUID } from "node:crypto";
 import path from "node:path";
@@ -18,15 +20,20 @@ import path from "node:path";
 import ExcelJS from "exceljs";
 import pg from "pg";
 
-const workbookPaths = process.argv.slice(2);
+const args = process.argv.slice(2);
+const publishMode = args.includes("--publish");
+const draftMode = args.includes("--draft");
+const workbookPaths = args.filter(
+  (argument) => argument !== "--publish" && argument !== "--draft",
+);
 const databaseUrl =
   process.env.DATABASE_URL ||
   process.env.SUPABASE_DB_URL ||
   "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
 
-if (!workbookPaths.length) {
+if (!workbookPaths.length || publishMode === draftMode) {
   console.error(
-    "Usage: node scripts/import-cesa-project-events.mjs <xlsx> [xlsx...]",
+    "Usage: node scripts/import-cesa-project-events.mjs (--draft|--publish) <xlsx> [xlsx...]",
   );
   process.exit(1);
 }
@@ -371,7 +378,7 @@ async function parseWorkbook(filePath, provincesByName) {
         seq,
       },
       is_demo: false,
-      is_published: true,
+      is_published: publishMode,
     };
 
     events.push(event);
@@ -417,17 +424,17 @@ async function main() {
         `  sheet=${parsed.sheetName} type=${parsed.kind} events=${parsed.events.length}`,
       );
 
-      await pool.query(
-        `delete from public.bess_project_events where source_batch = $1`,
-        [parsed.sourceBatch],
-      );
-
       let inserted = 0;
       let candidatesInserted = 0;
-      for (const group of chunk(parsed.events, 100)) {
-        const client = await pool.connect();
-        try {
-          await client.query("begin");
+      const client = await pool.connect();
+      try {
+        await client.query("begin");
+        await client.query(
+          `delete from public.bess_project_events where source_batch = $1`,
+          [parsed.sourceBatch],
+        );
+
+        for (const group of chunk(parsed.events, 100)) {
           for (const event of group) {
             const row = event;
             await client.query(
@@ -501,20 +508,20 @@ async function main() {
               candidatesInserted += 1;
             }
           }
-          await client.query("commit");
-        } catch (error) {
-          await client.query("rollback");
-          throw error;
-        } finally {
-          client.release();
         }
+        await client.query("commit");
+      } catch (error) {
+        await client.query("rollback");
+        throw error;
+      } finally {
+        client.release();
       }
 
       const unknown = parsed.events.filter(
         (event) => event.province_label === UNKNOWN_PROVINCE,
       ).length;
       console.log(
-        `  inserted events=${inserted} candidates=${candidatesInserted} unknown_province=${unknown}`,
+        `  inserted events=${inserted} candidates=${candidatesInserted} unknown_province=${unknown} mode=${publishMode ? "published" : "draft"}`,
       );
     }
 

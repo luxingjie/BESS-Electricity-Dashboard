@@ -1,6 +1,6 @@
 # GL-MVP-002 Implementation Status
 
-本状态表以已完成的 `GL-MVP-001`、中国/全球地区前端扩展，以及 `GL-MVP-002` 单篇 URL/PDF/Excel 人工审核导入为边界。自动来源扫描、OCR、登录站点抓取和七类专题的真实数据采集仍明确延期。
+本状态表以已完成的 `GL-MVP-001`、中国/全球地区前端扩展，以及 `GL-MVP-002` 单篇 URL/PDF/Excel 人工审核导入为边界。自动来源扫描、OCR、登录站点抓取和八类专题的真实数据采集仍明确延期。
 
 ## GL-MVP-002 导入闭环
 
@@ -29,14 +29,14 @@
 | 地区模型 | 完成 | migration/seed 空库重放；1 Global + 6 Continents + 24 Countries + 中国 31 Provinces 层级单测；公开地区 API | 代表国家可按后续需求继续调整；暂不做地区后台 CRUD |
 | Signal 审核发布 | 完成 | 领域测试；真实 Auth/RLS/HTTP E2E；数据库发布触发器与约束 | AI 候选由上方独立导入审核区接入 |
 | Market Metrics | 完成 | null/zero 单测；公开 RLS；Admin 新增/编辑页 | Demo seed 不包含虚构数值 |
-| 公开看板 | 完成 | 首页六大洲目录；大洲递归范围；地区、搜索、详情与原文链接；中国31省×7专题读取独立发布数据 | 尚未录入真实专题数据时保持明确空态 |
-| Admin | 完成 | 未登录重定向/API 401；真实 Supabase Admin Auth；Signal、Metric、七专题草稿/发布入口 | 单管理员角色，无复杂 RBAC |
+| 公开看板 | 完成 | 首页六大洲目录；大洲递归范围；地区、搜索、详情与原文链接；中国31省×8专题读取独立发布数据 | 尚未录入真实专题数据时保持明确空态 |
+| Admin | 完成 | 未登录重定向/API 401；真实 Supabase Admin Auth；Signal、Metric、八专题草稿/发布入口 | 单管理员角色，无复杂 RBAC |
 | 部署 | 完成（配置） | `next build`；Supabase 空库 reset；Vercel/Supabase 部署手册 | 未持有业务方云项目/域名，未执行远程上线 |
 | AI 抓取与 URL/PDF/Excel 导入 | 完成 | 见上方 GL-MVP-002 导入闭环 | 自动来源扫描仍延期 |
 
-## 中国七类专题数据接入边界
+## 中国八类专题数据接入边界
 
-当前实现是与现有七专题前端直接对齐的“人工审核发布读模型”：`china_province_topic_records` 保存省份×专题发布单元，`china_province_topic_fields` 保存字段值、覆盖状态和字段级来源定位。它解决管理员无入口和公开端无真实数据契约的问题，但不宣称已经完成 Working Spec 中更长期的 `DocumentVersion → Event → Fact → 七类专用明细表` 全证据架构；复杂价表多行、辅助服务多品种和同字段多 Fact 关系仍需后续专用模型承接。
+当前实现是与现有八专题前端直接对齐的“人工审核发布读模型”：`china_province_topic_records` 保存省份×专题发布单元，`china_province_topic_fields` 保存字段值、覆盖状态和字段级来源定位。它解决管理员无入口和公开端无真实数据契约的问题，但不宣称已经完成 Working Spec 中更长期的 `DocumentVersion → Event → Fact → 八类专用明细表` 全证据架构；复杂价表多行、辅助服务多品种和同字段多 Fact 关系仍需后续专用模型承接。
 
 | 专题 | 模型 | 来源 | API | UI | 测试 | 真实数据覆盖率 |
 |---|---|---|---|---|---|---|
@@ -47,8 +47,9 @@
 | 省级储能系统运行费用 | 独立记录/字段模型完成 | 管理员人工录入及字段级证据 | 专题 Admin/Public API 完成 | 已发布值、状态、来源展示完成 | Taxonomy/服务/发布隔离测试 | 尚未录入真实数据 |
 | 省级绿电直连政策 | 独立记录/字段模型完成 | 管理员人工录入及字段级证据 | 专题 Admin/Public API 完成 | 已发布值、状态、来源展示完成 | Taxonomy/服务/发布隔离测试 | 尚未录入真实数据 |
 | 省级电力零售规则 | 独立记录/字段模型完成 | 管理员人工录入及字段级证据 | 专题 Admin/Public API 完成 | 已发布值、状态、来源展示完成 | Taxonomy/服务/发布隔离测试 | 尚未录入真实数据 |
+| 风光机制电价（136号文） | 独立记录/字段模型完成；与储能容量补偿和用网成本隔离 | 管理员人工录入及字段级证据 | 专题 Admin/Public API 完成 | 已发布值、状态、来源展示完成 | Taxonomy/迁移 allow-list/发布隔离测试 | 尚未录入真实数据 |
 
-## 省级七专题对齐验证记录
+## 省级八专题对齐验证记录
 
 - `npx supabase migration up --local`：成功应用 `202607220010`、`202607240001_china_province_topic_module.sql`、`202607240002_lock_published_topic_fields.sql` 和 `202607240003_allow_topic_record_cascade_delete.sql`。
 - `npx supabase db lint --local --level warning`：`public` / `extensions` schema 无错误。

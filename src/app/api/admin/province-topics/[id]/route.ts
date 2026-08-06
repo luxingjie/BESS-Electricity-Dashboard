@@ -1,8 +1,14 @@
 import { NextResponse } from "next/server";
 
+import {
+  parseApiUuidPath,
+  type AdminProvinceTopicResponse,
+} from "@/lib/api/contracts";
 import { requireAdminApi } from "@/lib/auth/admin";
+import { provinceTopicDraftInputSchema } from "@/lib/china-market/schemas";
 import { errorResponse } from "@/lib/http/errors";
 import { assertTrustedJsonMutation } from "@/lib/http/security";
+import { parseWithSchema, readJsonBody } from "@/lib/http/validation";
 import { SupabaseProvinceTopicRepository } from "@/lib/repositories/supabase";
 import { ProvinceTopicService } from "@/lib/services/province-topic-service";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -13,7 +19,7 @@ export async function GET(
 ) {
   try {
     await requireAdminApi();
-    const { id } = await context.params;
+    const id = parseApiUuidPath((await context.params).id);
     const client = await createServerSupabaseClient();
     const record = await new SupabaseProvinceTopicRepository(
       client,
@@ -24,7 +30,9 @@ export async function GET(
         { status: 404 },
       );
     }
-    return NextResponse.json({ data: record });
+    return NextResponse.json({
+      data: record,
+    } satisfies AdminProvinceTopicResponse);
   } catch (error) {
     return errorResponse(error);
   }
@@ -37,17 +45,21 @@ export async function PATCH(
   try {
     assertTrustedJsonMutation(request);
     const admin = await requireAdminApi();
-    const { id } = await context.params;
+    const id = parseApiUuidPath((await context.params).id);
     const client = await createServerSupabaseClient();
     const service = new ProvinceTopicService(
       new SupabaseProvinceTopicRepository(client),
     );
     const record = await service.saveDraft(
       { id: admin.id, role: "admin" },
-      await request.json(),
+      parseWithSchema(
+        provinceTopicDraftInputSchema.safeParse(await readJsonBody(request)),
+      ),
       id,
     );
-    return NextResponse.json({ data: record });
+    return NextResponse.json({
+      data: record,
+    } satisfies AdminProvinceTopicResponse);
   } catch (error) {
     return errorResponse(error);
   }

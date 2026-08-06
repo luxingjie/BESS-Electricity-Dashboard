@@ -25,16 +25,23 @@ import type {
   UpdateSignalRecord,
 } from "./contracts";
 import type {
-  BessAwardCandidate,
   BessProjectEvent,
   ChinaCfdAuction,
   MarketMetric,
   ProvinceTopicField,
   ProvinceTopicRecord,
   ProvinceTopicRecordWithFields,
+  PublicBessProjectEvent,
   Region,
   Signal,
 } from "../types";
+import {
+  PUBLIC_BESS_AWARD_CANDIDATE_SELECT,
+  PUBLIC_BESS_PROJECT_EVENT_SELECT,
+  toPublicBessProjectEvent,
+  type PublicBessAwardCandidateRow,
+  type PublicBessProjectEventRow,
+} from "../http/public-project-event";
 
 interface PublicFilterBuilder {
   eq(column: string, value: unknown): this;
@@ -107,6 +114,15 @@ class PersistenceError extends Error {
 
   constructor(operation: string, detail?: string) {
     super(`Database operation failed: ${operation}${detail ? ` (${detail})` : ""}`);
+  }
+}
+
+class PersistenceNotFoundError extends Error {
+  readonly status = 404;
+  readonly code = "NOT_FOUND";
+
+  constructor(entity: string) {
+    super(`${entity} 不存在`);
   }
 }
 
@@ -281,8 +297,9 @@ export class SupabaseMarketMetricRepository implements MarketMetricRepository {
       .update(input)
       .eq("id", id)
       .select("*")
-      .single();
+      .maybeSingle();
     throwIfError("update market metric", error);
+    if (!data) throw new PersistenceNotFoundError("市场指标");
     return data as MarketMetric;
   }
 }
@@ -342,8 +359,9 @@ export class SupabaseCfdAuctionRepository implements CfdAuctionRepository {
       .update(input)
       .eq("id", id)
       .select("*")
-      .single();
+      .maybeSingle();
     throwIfError("update cfd auction", error);
+    if (!data) throw new PersistenceNotFoundError("竞价记录");
     return data as ChinaCfdAuction;
   }
 }
@@ -518,7 +536,7 @@ export class SupabaseBessProjectEventRepository
 
     let listQuery = this.client
       .from("bess_project_events")
-      .select("*")
+      .select(PUBLIC_BESS_PROJECT_EVENT_SELECT)
       .eq("is_published", true)
       .order("event_date", { ascending: false })
       .order("created_at", { ascending: false })
@@ -527,23 +545,26 @@ export class SupabaseBessProjectEventRepository
 
     const { data, error } = await listQuery;
     throwIfError("list published bess project events page", error);
-    const items = (data ?? []) as BessProjectEvent[];
+    const items = (data ?? []) as unknown as PublicBessProjectEventRow[];
 
     // List payload only needs the primary candidate for award rows.
     // Full candidate lists load on demand via getPublicById.
     const awardIds = items
       .filter((event) => event.event_type === "award")
       .map((event) => event.id);
-    const candidatesByEvent = new Map<string, BessAwardCandidate[]>();
+    const candidatesByEvent = new Map<
+      string,
+      PublicBessAwardCandidateRow[]
+    >();
     if (awardIds.length) {
       const { data: candidates, error: candidateError } = await this.client
         .from("bess_award_candidates")
-        .select("*")
+        .select(PUBLIC_BESS_AWARD_CANDIDATE_SELECT)
         .in("event_id", awardIds)
         .or("is_primary.eq.true,rank_order.eq.1")
         .order("rank_order", { ascending: true, nullsFirst: false });
       throwIfError("list page bess award candidates", candidateError);
-      for (const candidate of (candidates ?? []) as BessAwardCandidate[]) {
+      for (const candidate of (candidates ?? []) as unknown as PublicBessAwardCandidateRow[]) {
         const existing = candidatesByEvent.get(candidate.event_id);
         if (existing?.length) continue;
         candidatesByEvent.set(candidate.event_id, [candidate]);
@@ -557,9 +578,6 @@ export class SupabaseBessProjectEventRepository
           .filter((value): value is string => Boolean(value)),
       ),
     ];
-    if (!sources.length) {
-      sources.push("CESA储能应用分会");
-    }
 
     const total = query.event_type
       ? query.event_type === "tender"
@@ -570,10 +588,12 @@ export class SupabaseBessProjectEventRepository
       : all;
 
     return {
-      items: items.map((event) => ({
-        ...event,
-        candidates: candidatesByEvent.get(event.id) ?? [],
-      })),
+      items: items.map((event) =>
+        toPublicBessProjectEvent(
+          event,
+          candidatesByEvent.get(event.id) ?? [],
+        ),
+      ),
       total,
       page,
       page_size: pageSize,
@@ -672,31 +692,33 @@ export class SupabaseBessProjectEventRepository
     };
   }
 
-  async getPublicById(id: string): Promise<BessProjectEvent | null> {
+  async getPublicById(
+    id: string,
+  ): Promise<PublicBessProjectEvent | null> {
     const { data, error } = await this.client
       .from("bess_project_events")
-      .select("*")
+      .select(PUBLIC_BESS_PROJECT_EVENT_SELECT)
       .eq("id", id)
       .eq("is_published", true)
       .maybeSingle();
     throwIfError("get published bess project event", error);
     if (!data) return null;
 
-    const event = data as BessProjectEvent;
+    const event = data as unknown as PublicBessProjectEventRow;
     if (event.event_type !== "award") {
-      return { ...event, candidates: [] };
+      return toPublicBessProjectEvent(event);
     }
 
     const { data: candidates, error: candidateError } = await this.client
       .from("bess_award_candidates")
-      .select("*")
+      .select(PUBLIC_BESS_AWARD_CANDIDATE_SELECT)
       .eq("event_id", id)
       .order("rank_order", { ascending: true, nullsFirst: false });
     throwIfError("list bess award candidates for detail", candidateError);
 
-    return {
-      ...event,
-      candidates: (candidates ?? []) as BessAwardCandidate[],
-    };
+    return toPublicBessProjectEvent(
+      event,
+      (candidates ?? []) as unknown as PublicBessAwardCandidateRow[],
+    );
   }
 }

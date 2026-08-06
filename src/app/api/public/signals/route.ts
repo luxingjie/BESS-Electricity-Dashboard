@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 
+import {
+  parseApiQuery,
+  publicSignalsQuerySchema,
+  type PublicSignalsResponse,
+} from "@/lib/api/contracts";
 import { errorResponse } from "@/lib/http/errors";
 import { resolvePublicRegionQuery } from "@/lib/http/public-region-scope";
 import { toPublicSignal } from "@/lib/http/public-signal";
@@ -16,24 +21,25 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   try {
     if (!getSupabaseConfig()) return NextResponse.json({ error: { code: "NOT_CONFIGURED" } }, { status: 503 });
-    const url = new URL(request.url);
-    const requestedLimit = Number(url.searchParams.get("limit"));
-    const limit = Number.isFinite(requestedLimit)
-      ? Math.max(1, Math.min(Math.trunc(requestedLimit), 100))
-      : 100;
+    const query = parseApiQuery(
+      publicSignalsQuerySchema,
+      new URL(request.url).searchParams,
+    );
     const client = await createServerSupabaseClient();
     const regionQuery = await resolvePublicRegionQuery(
-      url.searchParams.get("region_id") || undefined,
-      url.searchParams.get("scope"),
+      query.region_id,
+      query.scope ?? null,
       new SupabaseRegionRepository(client),
     );
     const service = new SignalService(new SupabaseSignalRepository(client));
     const signals = await service.listPublic({
       ...regionQuery,
-      search: url.searchParams.get("q") || undefined,
-      limit,
+      search: query.q,
+      limit: query.limit,
     });
-    return NextResponse.json({ data: signals.map(toPublicSignal) });
+    return NextResponse.json({
+      data: signals.map(toPublicSignal),
+    } satisfies PublicSignalsResponse);
   } catch (error) {
     return errorResponse(error);
   }

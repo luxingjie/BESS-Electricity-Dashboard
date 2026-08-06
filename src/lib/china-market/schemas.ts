@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { isHttpUrl } from "@/lib/validation/http-url";
+
 import { CHINA_MARKET_TOPIC_IDS } from "./taxonomy";
 import {
   PROVINCE_TOPIC_FIELD_COVERAGE_STATUSES,
@@ -15,22 +17,29 @@ const nullableText = z.preprocess(
   z.string().trim().min(1).nullable(),
 );
 
+const dateOnly = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "日期必须为 YYYY-MM-DD")
+  .refine((value) => {
+    const [year, month, day] = value.split("-").map(Number);
+    const date = new Date(Date.UTC(year, month - 1, day));
+    return (
+      date.getUTCFullYear() === year &&
+      date.getUTCMonth() === month - 1 &&
+      date.getUTCDate() === day
+    );
+  }, "日期不存在");
+
 const nullableDate = z.preprocess(
   emptyStringToNull,
-  z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, "日期必须为 YYYY-MM-DD")
-    .nullable(),
+  dateOnly.nullable(),
 );
 
 const httpUrl = z
   .string()
   .trim()
   .url()
-  .refine((value) => {
-    const protocol = new URL(value).protocol;
-    return protocol === "http:" || protocol === "https:";
-  }, "来源链接必须使用 HTTP 或 HTTPS");
+  .refine(isHttpUrl, "来源链接必须使用 HTTP 或 HTTPS");
 
 const nullableUrl = z.preprocess(emptyStringToNull, httpUrl.nullable());
 

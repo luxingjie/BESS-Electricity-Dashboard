@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 
+import {
+  parseApiUuidPath,
+  type PublicProjectEventResponse,
+} from "@/lib/api/contracts";
 import { errorResponse } from "@/lib/http/errors";
 import { SupabaseBessProjectEventRepository } from "@/lib/repositories/supabase";
 import { getSupabaseConfig } from "@/lib/supabase/config";
@@ -19,13 +23,7 @@ export async function GET(
       );
     }
 
-    const { id } = await context.params;
-    if (!id) {
-      return NextResponse.json(
-        { error: { code: "BAD_REQUEST", message: "Missing id" } },
-        { status: 400 },
-      );
-    }
+    const id = parseApiUuidPath((await context.params).id);
 
     const client = await createServerSupabaseClient();
     const repository = new SupabaseBessProjectEventRepository(client);
@@ -37,7 +35,7 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({ data });
+    return NextResponse.json({ data } satisfies PublicProjectEventResponse);
   } catch (error) {
     return errorResponse(error);
   }

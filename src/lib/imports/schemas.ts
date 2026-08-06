@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { isHttpUrl } from "@/lib/validation/http-url";
+
 import {
   IMPORT_INPUT_TYPES,
   IMPORT_TARGET_TYPES,
@@ -21,10 +23,7 @@ export const httpUrlSchema = z
   .trim()
   .url()
   .max(4_096)
-  .refine((value) => {
-    const protocol = new URL(value).protocol;
-    return protocol === "http:" || protocol === "https:";
-  }, "URL 必须使用 HTTP 或 HTTPS");
+  .refine(isHttpUrl, "URL 必须使用 HTTP 或 HTTPS");
 
 export const importEvidenceSchema = z
   .object({

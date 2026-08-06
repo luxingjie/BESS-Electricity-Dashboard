@@ -1,41 +1,38 @@
 import { NextResponse } from "next/server";
 
+import {
+  adminProvinceTopicsQuerySchema,
+  parseApiQuery,
+  type AdminProvinceTopicResponse,
+  type AdminProvinceTopicsResponse,
+} from "@/lib/api/contracts";
 import { requireAdminApi } from "@/lib/auth/admin";
-import { CHINA_MARKET_TOPIC_IDS } from "@/lib/china-market/taxonomy";
+import { provinceTopicDraftInputSchema } from "@/lib/china-market/schemas";
 import { errorResponse } from "@/lib/http/errors";
 import { assertTrustedJsonMutation } from "@/lib/http/security";
+import { parseWithSchema, readJsonBody } from "@/lib/http/validation";
 import { SupabaseProvinceTopicRepository } from "@/lib/repositories/supabase";
 import { ProvinceTopicService } from "@/lib/services/province-topic-service";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import {
-  REVIEW_STATUSES,
-  type ReviewStatus,
-} from "@/lib/types";
-import type { ChinaMarketTopicId } from "@/lib/china-market/taxonomy";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   try {
     await requireAdminApi();
-    const url = new URL(request.url);
-    const rawTopic = url.searchParams.get("topic_id");
-    const rawStatus = url.searchParams.get("review_status");
-    const topicId = CHINA_MARKET_TOPIC_IDS.includes(
-      rawTopic as ChinaMarketTopicId,
-    )
-      ? (rawTopic as ChinaMarketTopicId)
-      : undefined;
-    const reviewStatus = REVIEW_STATUSES.includes(rawStatus as ReviewStatus)
-      ? (rawStatus as ReviewStatus)
-      : undefined;
+    const query = parseApiQuery(
+      adminProvinceTopicsQuerySchema,
+      new URL(request.url).searchParams,
+    );
     const client = await createServerSupabaseClient();
     const records = await new SupabaseProvinceTopicRepository(client).listAdmin({
-      region_id: url.searchParams.get("region_id") || undefined,
-      topic_id: topicId,
-      review_status: reviewStatus,
+      region_id: query.region_id,
+      topic_id: query.topic_id,
+      review_status: query.review_status,
     });
-    return NextResponse.json({ data: records });
+    return NextResponse.json({
+      data: records,
+    } satisfies AdminProvinceTopicsResponse);
   } catch (error) {
     return errorResponse(error);
   }
@@ -51,9 +48,14 @@ export async function POST(request: Request) {
     );
     const record = await service.saveDraft(
       { id: admin.id, role: "admin" },
-      await request.json(),
+      parseWithSchema(
+        provinceTopicDraftInputSchema.safeParse(await readJsonBody(request)),
+      ),
     );
-    return NextResponse.json({ data: record }, { status: 201 });
+    return NextResponse.json(
+      { data: record } satisfies AdminProvinceTopicResponse,
+      { status: 201 },
+    );
   } catch (error) {
     return errorResponse(error);
   }

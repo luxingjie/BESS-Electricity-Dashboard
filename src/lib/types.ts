@@ -200,6 +200,17 @@ export interface ProvinceTopicRecordWithFields extends ProvinceTopicRecord {
   fields: ProvinceTopicField[];
 }
 
+/** Province-topic record allowed to cross the anonymous Viewer boundary. */
+export type PublicProvinceTopicRecord = Omit<
+  ProvinceTopicRecord,
+  "reviewer_id" | "created_by"
+>;
+
+export interface PublicProvinceTopicRecordWithFields
+  extends PublicProvinceTopicRecord {
+  fields: ProvinceTopicField[];
+}
+
 /**
  * One province-level grid area x auction round in the China wind/solar CfD
  * (mechanism price, NDRC Doc 136) master table. NULL numeric values mean
@@ -319,6 +330,29 @@ export interface BessProjectEvent {
   updated_at: string;
   candidates?: BessAwardCandidate[];
 }
+
+/** Candidate fields allowed to cross the anonymous Viewer API boundary. */
+export type PublicBessAwardCandidate = Omit<
+  BessAwardCandidate,
+  "event_id" | "created_at" | "updated_at"
+>;
+
+/**
+ * Public project-event DTO. Import batch identifiers, row hashes, raw workbook
+ * metadata and publication bookkeeping are deliberately server-only.
+ */
+export type PublicBessProjectEvent = Omit<
+  BessProjectEvent,
+  | "source_batch"
+  | "source_row_hash"
+  | "raw"
+  | "is_published"
+  | "created_at"
+  | "updated_at"
+  | "candidates"
+> & {
+  candidates: PublicBessAwardCandidate[];
+};
 
 export type ActorRole = "admin" | "reviewer" | "viewer";
 

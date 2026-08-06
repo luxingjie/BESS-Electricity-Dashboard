@@ -4,6 +4,8 @@ import { SignalService } from "../../src/lib/services/signal-service";
 import type { Actor } from "../../src/lib/types";
 import { InMemorySignalRepository } from "../helpers/in-memory-signal-repository";
 
+const SHANDONG_REGION_ID = "11111111-1111-4111-8111-111111111111";
+
 function loginAsAdmin(email: string, password: string): Actor | null {
   if (email === "admin@grid-ledger.test" && password === "test-password") {
     return { id: "admin-e2e", role: "admin", email };
@@ -29,7 +31,7 @@ describe("administrator manual entry and publication flow", () => {
 
     // Create a Demo Shandong policy and save it as a manual draft.
     const draft = await service.saveDraft(actor, {
-      region_id: "region-shandong",
+      region_id: SHANDONG_REGION_ID,
       signal_type: "policy",
       title: "DEMO 山东省政策条目",
       summary: "该条目仅用于端到端工作流测试，不是真实市场数据。",
@@ -45,7 +47,7 @@ describe("administrator manual entry and publication flow", () => {
 
     // It must not appear in a public region list or public detail endpoint.
     await expect(
-      service.listPublic({ region_id: "region-shandong" }),
+      service.listPublic({ region_id: SHANDONG_REGION_ID }),
     ).resolves.toEqual([]);
     await expect(service.getPublicById(draft.id)).resolves.toBeNull();
 
@@ -59,7 +61,7 @@ describe("administrator manual entry and publication flow", () => {
 
     // The Shandong page can now find it.
     const shandongSignals = await service.listPublic({
-      region_id: "region-shandong",
+      region_id: SHANDONG_REGION_ID,
     });
     expect(shandongSignals.map((signal) => signal.id)).toContain(draft.id);
 

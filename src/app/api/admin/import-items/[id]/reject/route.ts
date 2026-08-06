@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 
+import { parseApiUuidPath } from "@/lib/api/contracts";
 import { requireAdminApi } from "@/lib/auth/admin";
 import { errorResponse } from "@/lib/http/errors";
 import { assertTrustedJsonMutation } from "@/lib/http/security";
+import { RequestValidationError, readJsonBody } from "@/lib/http/validation";
 import { rejectImportItemSchema } from "@/lib/imports/schemas";
 import { ImportWorkflowError } from "@/lib/imports/service";
 import { SupabaseImportRepository } from "@/lib/imports/supabase-repository";
-import { RequestValidationError } from "@/lib/validation/market-metric";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -18,9 +19,9 @@ export async function POST(
   try {
     assertTrustedJsonMutation(request);
     const admin = await requireAdminApi();
-    const payload = rejectImportItemSchema.safeParse(await request.json());
+    const payload = rejectImportItemSchema.safeParse(await readJsonBody(request));
     if (!payload.success) throw new RequestValidationError(payload.error.flatten());
-    const { id } = await context.params;
+    const id = parseApiUuidPath((await context.params).id);
     const client = await createServerSupabaseClient();
     const repository = new SupabaseImportRepository(client);
     if (!(await repository.getItem(id))) {

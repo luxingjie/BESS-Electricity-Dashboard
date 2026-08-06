@@ -5,7 +5,6 @@ export {
   SearchForm,
   SignalList,
   StatusPill,
-  isPublishedSignal,
 } from "./Dashboard";
 export type {
   DashboardProps,
@@ -14,8 +13,9 @@ export type {
   SearchFormProps,
   SignalListProps,
   StatusPillProps,
-  PublishedSignal,
 } from "./Dashboard";
+export { isPublishedSignal } from "@/lib/domain/public-signal";
+export type { PublishedSignal } from "@/lib/domain/public-signal";
 export { SignalDetail } from "./SignalDetail";
 export type { SignalDetailProps } from "./SignalDetail";
 export { ChinaProvinceMarketAtlas } from "./ChinaProvinceMarketAtlas";
