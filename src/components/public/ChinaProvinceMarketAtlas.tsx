@@ -289,12 +289,11 @@ export function ChinaProvinceMarketAtlas({
   const activeProvinceMetrics = activeProvince
     ? chinaMetrics.filter((metric) => metric.region_id === activeProvince.id)
     : [];
-  const activeProvinceCfdAuctions = useMemo(() => {
-    if (!activeProvince) return [];
-    return cfdAuctions.filter(
-      (auction) => auction.region_id === activeProvince.id,
-    );
-  }, [activeProvince, cfdAuctions]);
+  const activeProvinceCfdAuctions = activeProvince
+    ? cfdAuctions.filter(
+        (auction) => auction.region_id === activeProvince.id,
+      )
+    : [];
   const activeTopicRecords = provinces
     .map((province) =>
       recordsByCell.get(recordCellKey(province.id, activeTopic.id)),

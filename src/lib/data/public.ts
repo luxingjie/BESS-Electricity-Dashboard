@@ -30,16 +30,6 @@ export type PublicDashboardData = {
   projectEvents: BessProjectEvent[];
 };
 
-const EMPTY_DATA: PublicDashboardData = {
-  configured: false,
-  regions: [],
-  signals: [],
-  marketMetrics: [],
-  provinceTopics: [],
-  cfdAuctions: [],
-  projectEvents: [],
-};
-
 export async function getPublicDashboardData(): Promise<PublicDashboardData> {
   if (!getSupabaseConfig()) {
     // Fallback: return mock data when Supabase is not configured
