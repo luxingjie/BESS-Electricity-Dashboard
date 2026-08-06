@@ -384,7 +384,6 @@ export function Dashboard({
       (!regionIds || regionIds.has(record.region_id)),
   );
   const realPublishedSignals = publishedSignals.filter((signal) => !isDemo(signal));
-  const realPublishedMetrics = publishedMetrics.filter((metric) => !metric.is_demo);
   // Regions are structural seed/reference rows. A real Signal must never inherit
   // a Demo label only because its region was preloaded by the MVP seed.
   const hasDemoData =
@@ -440,7 +439,7 @@ export function Dashboard({
         module === "policy"
           ? `${realPublishedSignals.length} 条已发布`
           : module === "market"
-            ? `${realPublishedMetrics.length} 条指标`
+            ? "全球储能展望"
             : module === "projects"
               ? "招标 / 中标 / 并网"
               : DASHBOARD_MODULE_META[module].detail,
@@ -582,8 +581,8 @@ export function Dashboard({
                 </div>
               )}
               <div className="gl-meta-row">
-                <span>市场指标</span>
-                <strong>{realPublishedMetrics.length}</strong>
+                <span>第三方展望</span>
+                <strong>1</strong>
               </div>
             </div>
             <nav
@@ -677,18 +676,8 @@ export function Dashboard({
                   <div className="gl-section-kicker">04 · Market data</div>
                   <h2>市场数据</h2>
                 </div>
-                <span className="gl-record-count">
-                  {realPublishedMetrics.length
-                    ? `${realPublishedMetrics.length} 条已发布`
-                    : "第三方展望已接入"}
-                </span>
+                <span className="gl-record-count">第三方展望已接入</span>
               </div>
-              {realPublishedMetrics.length ? (
-                <MarketMetrics
-                  metrics={realPublishedMetrics}
-                  regions={regions}
-                />
-              ) : null}
               <SpGlobalStorageOutlook />
             </section>
           ) : null}
