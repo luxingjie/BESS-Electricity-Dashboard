@@ -34,6 +34,7 @@ export type {
 export { PolicyFeed } from "./PolicyFeed";
 export { ProjectsTendersPanel } from "./ProjectsTendersPanel";
 export type { ProjectsTendersPanelProps } from "./ProjectsTendersPanel";
+export { SpGlobalStorageOutlook } from "./SpGlobalStorageOutlook";
 export {
   formatDate,
   formatNullableNumber,

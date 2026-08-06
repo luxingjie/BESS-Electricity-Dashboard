@@ -1630,7 +1630,355 @@ button.gl-region-button.is-desk.is-expanded {
 }
 
 .gl-market-panel {
-  padding-right: 34px;
+  padding-right: 0;
+}
+
+.gl-sp-outlook {
+  margin-top: 28px;
+  padding: 18px 16px 16px;
+  border: 1px solid var(--gl-rule);
+  border-radius: 12px;
+  background: #f7f9f6;
+  overflow: visible;
+}
+
+.gl-sp-outlook-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px 16px;
+  margin-bottom: 12px;
+}
+
+.gl-sp-outlook-head h3 {
+  margin: 4px 0 0;
+  font-size: 16px;
+  font-weight: 650;
+}
+
+.gl-sp-outlook-summary {
+  margin: 6px 0 0;
+  color: #667068;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.gl-sp-outlook-summary strong {
+  color: #243028;
+  font-weight: 650;
+}
+
+.gl-sp-outlook-filter {
+  display: grid;
+  gap: 4px;
+  color: #667068;
+  font-size: 12px;
+  min-width: 88px;
+}
+
+.gl-sp-outlook-filter select {
+  min-width: 88px;
+  padding: 7px 10px;
+  border: 1px solid var(--gl-rule);
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+}
+
+.gl-sp-outlook-footnotes {
+  display: grid;
+  gap: 10px;
+  overflow: visible;
+}
+
+.gl-sp-outlook-source {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid #d7e3d8;
+  border-radius: 10px;
+  background: #fff;
+  overflow: visible;
+}
+
+.gl-sp-outlook-source-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #e8f2ea;
+  color: #1f6b3a;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+}
+
+.gl-sp-outlook-source > div {
+  display: grid;
+  gap: 4px;
+}
+
+.gl-sp-outlook-source strong {
+  display: inline;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.gl-sp-outlook-source > div > span:not(.gl-sp-outlook-source-tip) {
+  color: #667068;
+  font-size: 12px;
+}
+
+.gl-sp-outlook-footnotes .gl-boundary-note {
+  margin: 0;
+}
+
+.gl-sp-outlook-stack {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  overflow: visible;
+}
+
+.gl-sp-outlook-chart {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--gl-rule);
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.gl-sp-outlook-chart-trend {
+  overflow: visible;
+}
+
+.gl-sp-outlook-chart-detail {
+  background: #fbfcfb;
+  border-color: #cfe0d2;
+}
+
+.gl-sp-outlook-chart header,
+.gl-sp-outlook-chart-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 10px 14px;
+  margin-bottom: 12px;
+}
+
+.gl-sp-outlook-chart-head > div {
+  display: grid;
+  gap: 2px;
+}
+
+.gl-sp-outlook-chart header strong,
+.gl-sp-outlook-chart-head strong {
+  font-size: 13px;
+}
+
+.gl-sp-outlook-chart header span,
+.gl-sp-outlook-chart-head span {
+  color: #7a807b;
+  font-size: 11px;
+}
+
+.gl-sp-outlook-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+
+.gl-sp-outlook-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #55605a;
+  font-size: 11px;
+}
+
+.gl-sp-outlook-legend i,
+.gl-sp-outlook-swatch {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  flex: 0 0 auto;
+}
+
+.gl-sp-outlook-stacked {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 6px;
+  align-items: end;
+  min-height: 260px;
+  padding-top: 4px;
+}
+
+.gl-sp-outlook-year-col {
+  appearance: none;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 6px;
+  align-items: end;
+  min-width: 0;
+  height: 260px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: center;
+  cursor: pointer;
+  font: inherit;
+}
+
+.gl-sp-outlook-year-track {
+  display: flex;
+  align-items: flex-end;
+  height: 210px;
+  padding-top: 18px;
+  border-radius: 4px 4px 0 0;
+  background: #eef2ef;
+  overflow: visible;
+}
+
+.gl-sp-outlook-year-stack {
+  position: relative;
+  display: flex;
+  flex-direction: column-reverse;
+  width: 100%;
+  min-height: 2px;
+  border-radius: 4px 4px 0 0;
+  overflow: visible;
+}
+
+.gl-sp-outlook-year-stack > i {
+  display: block;
+  width: 100%;
+  min-height: 0;
+}
+
+.gl-sp-outlook-year-value {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 2px);
+  z-index: 1;
+  transform: translateX(-50%);
+  color: #3f4741;
+  font-family: var(--gl-font-mono);
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.gl-sp-outlook-year-label {
+  color: #55605a;
+  font-family: var(--gl-font-mono);
+  font-size: 11px;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.gl-sp-outlook-year-col.is-active .gl-sp-outlook-year-track {
+  outline: 2px solid #0b5c2c;
+  outline-offset: -2px;
+}
+
+.gl-sp-outlook-year-col.is-active .gl-sp-outlook-year-label,
+.gl-sp-outlook-year-col.is-active .gl-sp-outlook-year-value {
+  color: #0b5c2c;
+  font-weight: 700;
+}
+
+.gl-sp-outlook-source-tip {
+  position: relative;
+  display: inline-block;
+  width: fit-content;
+  cursor: help;
+}
+
+.gl-sp-outlook-source-tip > strong {
+  border-bottom: 1px dotted #8a918c;
+}
+
+.gl-sp-outlook-tip-bubble {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 10px);
+  z-index: 5;
+  width: min(360px, 72vw);
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid #cfe0d2;
+  border-radius: 10px;
+  background: #fff;
+  color: #3f4741;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.45;
+  box-shadow: 0 8px 24px rgba(17, 17, 17, 0.12);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition: opacity 120ms ease, transform 120ms ease, visibility 120ms ease;
+  pointer-events: none;
+}
+
+.gl-sp-outlook-tip-bubble::after {
+  content: "";
+  position: absolute;
+  left: 18px;
+  top: 100%;
+  border: 6px solid transparent;
+  border-top-color: #fff;
+  filter: drop-shadow(0 1px 0 #cfe0d2);
+}
+
+.gl-sp-outlook-source-tip:hover > strong,
+.gl-sp-outlook-source-tip:focus-visible > strong {
+  color: #0b5c2c;
+  border-bottom-color: #0b5c2c;
+}
+
+.gl-sp-outlook-source-tip:hover .gl-sp-outlook-tip-bubble,
+.gl-sp-outlook-source-tip:focus-visible .gl-sp-outlook-tip-bubble {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.gl-sp-outlook-source-tip:focus-visible {
+  outline: none;
+}
+
+.gl-sp-outlook-chart-detail .gl-projects-hbar li {
+  grid-template-columns: minmax(118px, 0.42fr) minmax(0, 1fr) 48px;
+}
+
+.gl-sp-outlook-chart-detail .gl-projects-hbar-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  overflow: visible;
+  text-overflow: unset;
+  white-space: normal;
+  line-height: 1.25;
+}
+
+.gl-sp-outlook-chart-detail .gl-projects-hbar-track > i {
+  background: none;
 }
 
 .gl-signal-panel {

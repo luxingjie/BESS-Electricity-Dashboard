@@ -31,6 +31,7 @@ import {
   RegionSelector,
   type RegionSelectorProps,
 } from "./RegionDirectory";
+import { SpGlobalStorageOutlook } from "./SpGlobalStorageOutlook";
 
 export { RegionSelector };
 export type { RegionSelectorProps };
@@ -384,15 +385,12 @@ export function Dashboard({
   );
   const realPublishedSignals = publishedSignals.filter((signal) => !isDemo(signal));
   const realPublishedMetrics = publishedMetrics.filter((metric) => !metric.is_demo);
-  const demoPublishedMetrics = publishedMetrics.filter((metric) => metric.is_demo);
   // Regions are structural seed/reference rows. A real Signal must never inherit
   // a Demo label only because its region was preloaded by the MVP seed.
   const hasDemoData =
     publishedSignals.some(isDemo) ||
     publishedMetrics.some((metric) => metric.is_demo) ||
     scopedProvinceTopics.some((record) => record.is_demo);
-  const statusCount = (status: string) =>
-    realPublishedSignals.filter((signal) => signal.normalized_status === status).length;
   const activeName = activeRegion ? regionName(activeRegion) : "全局观察";
   const resolvedSearchAction = searchAction || (activeRegion ? getRegionHref(activeRegion) : "/");
   const chinaRegion = regions.find(
@@ -669,48 +667,29 @@ export function Dashboard({
 
           {currentModule === "market" ? (
             <section
-              className="gl-dashboard-grid"
+              className="gl-panel gl-market-panel"
               id="market"
               role="tabpanel"
               aria-labelledby="dashboard-module-tab-market"
             >
-              <article className="gl-panel gl-market-panel">
-                <div className="gl-panel-header">
-                  <div>
-                    <div className="gl-section-kicker">04 · Market data</div>
-                    <h2>市场数据</h2>
-                  </div>
-                  <span className="gl-record-count">
-                    {realPublishedMetrics.length} 条已发布
-                    {demoPublishedMetrics.length
-                      ? ` · ${demoPublishedMetrics.length} 条演示`
-                      : ""}
-                  </span>
+              <div className="gl-panel-header">
+                <div>
+                  <div className="gl-section-kicker">04 · Market data</div>
+                  <h2>市场数据</h2>
                 </div>
-                <MarketMetrics metrics={publishedMetrics} regions={regions} />
-              </article>
-
-              <aside className="gl-panel gl-signal-panel" aria-label="政策状态分布">
-                <div className="gl-panel-header">
-                  <div>
-                    <div className="gl-section-kicker">政策状态</div>
-                    <h2>状态分布</h2>
-                  </div>
-                </div>
-                <div className="gl-status-ledger">
-                  {(["filed", "approved", "draft", "effective"] as const).map(
-                    (status) => (
-                      <div className="gl-status-row" key={status}>
-                        <StatusPill status={status} />
-                        <strong>{statusCount(status)}</strong>
-                      </div>
-                    ),
-                  )}
-                </div>
-                <p className="gl-boundary-note">
-                  已申报、已批准、草案、已生效相互独立统计；仅计入真实公开记录。
-                </p>
-              </aside>
+                <span className="gl-record-count">
+                  {realPublishedMetrics.length
+                    ? `${realPublishedMetrics.length} 条已发布`
+                    : "第三方展望已接入"}
+                </span>
+              </div>
+              {realPublishedMetrics.length ? (
+                <MarketMetrics
+                  metrics={realPublishedMetrics}
+                  regions={regions}
+                />
+              ) : null}
+              <SpGlobalStorageOutlook />
             </section>
           ) : null}
 
