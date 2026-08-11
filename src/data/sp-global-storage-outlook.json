@@ -1,0 +1,1416 @@
+{
+  "source_name": "S&P Global Commodity Insights",
+  "source_product": "Energy Storage Market Outlook",
+  "concept": "Gross capacity additions",
+  "vintage": "Latest forecast",
+  "geography_note": "Major region taxonomy from S&P Global; independent of this dashboard region tree.",
+  "units": {
+    "power": "MW-ac",
+    "energy": "MWh"
+  },
+  "regions": [
+    {
+      "key": "Asia-Pacific",
+      "label_en": "Asia-Pacific",
+      "label_zh": "亚太"
+    },
+    {
+      "key": "North America",
+      "label_en": "North America",
+      "label_zh": "北美"
+    },
+    {
+      "key": "Europe (EU-27)",
+      "label_en": "Europe (EU-27)",
+      "label_zh": "欧洲（欧盟27）"
+    },
+    {
+      "key": "Europe (non EU-27)",
+      "label_en": "Europe (non EU-27)",
+      "label_zh": "欧洲（非欧盟）"
+    },
+    {
+      "key": "Latin America",
+      "label_en": "Latin America",
+      "label_zh": "拉丁美洲"
+    },
+    {
+      "key": "Middle East",
+      "label_en": "Middle East",
+      "label_zh": "中东"
+    },
+    {
+      "key": "Africa",
+      "label_en": "Africa",
+      "label_zh": "非洲"
+    }
+  ],
+  "years": [
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026,
+    2027,
+    2028,
+    2029,
+    2030,
+    2031,
+    2032,
+    2033,
+    2034,
+    2035
+  ],
+  "power_mw": [
+    {
+      "year": 2035,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 159328.133
+    },
+    {
+      "year": 2034,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 153942.974
+    },
+    {
+      "year": 2033,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 150500.12
+    },
+    {
+      "year": 2032,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 146593.562
+    },
+    {
+      "year": 2031,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 140037.079
+    },
+    {
+      "year": 2030,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 128531.789
+    },
+    {
+      "year": 2029,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 113401.721
+    },
+    {
+      "year": 2028,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 106684.349
+    },
+    {
+      "year": 2027,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 98970.345
+    },
+    {
+      "year": 2026,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 93740.03
+    },
+    {
+      "year": 2025,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 74616.267
+    },
+    {
+      "year": 2024,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 48658.873
+    },
+    {
+      "year": 2028,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 35044.826
+    },
+    {
+      "year": 2027,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 34279.074
+    },
+    {
+      "year": 2029,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 34146.354
+    },
+    {
+      "year": 2029,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 32303.627
+    },
+    {
+      "year": 2030,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 31386.26
+    },
+    {
+      "year": 2028,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 31250.129
+    },
+    {
+      "year": 2023,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 30935.998
+    },
+    {
+      "year": 2031,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 28640.637
+    },
+    {
+      "year": 2033,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 28300.23
+    },
+    {
+      "year": 2032,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 28193.051
+    },
+    {
+      "year": 2035,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 27994.222
+    },
+    {
+      "year": 2031,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 27992.548
+    },
+    {
+      "year": 2034,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 27982.038
+    },
+    {
+      "year": 2030,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 27816.364
+    },
+    {
+      "year": 2027,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 27734.079
+    },
+    {
+      "year": 2026,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 26933.583
+    },
+    {
+      "year": 2032,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 26787.667
+    },
+    {
+      "year": 2033,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 26677.504
+    },
+    {
+      "year": 2026,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 26390.556
+    },
+    {
+      "year": 2034,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 25867.414
+    },
+    {
+      "year": 2035,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 25572.892
+    },
+    {
+      "year": 2025,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 18731.832
+    },
+    {
+      "year": 2025,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 14093.123
+    },
+    {
+      "year": 2024,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 12901.701
+    },
+    {
+      "year": 2035,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 12867.969
+    },
+    {
+      "year": 2034,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 10885.853
+    },
+    {
+      "year": 2024,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 10565.921
+    },
+    {
+      "year": 2022,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 9754.099
+    },
+    {
+      "year": 2023,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 9690.501
+    },
+    {
+      "year": 2033,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 9200.549
+    },
+    {
+      "year": 2030,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 9174.223
+    },
+    {
+      "year": 2023,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 8807.939
+    },
+    {
+      "year": 2033,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 8053.797
+    },
+    {
+      "year": 2029,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 7928.773
+    },
+    {
+      "year": 2032,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 7715.785
+    },
+    {
+      "year": 2032,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 7674.986
+    },
+    {
+      "year": 2028,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 7670.041
+    },
+    {
+      "year": 2035,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 7560.865
+    },
+    {
+      "year": 2027,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 7421.686
+    },
+    {
+      "year": 2034,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 7365.617
+    },
+    {
+      "year": 2031,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 7279.105
+    },
+    {
+      "year": 2027,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 6872.685
+    },
+    {
+      "year": 2031,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 6707.443
+    },
+    {
+      "year": 2026,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 6216.902
+    },
+    {
+      "year": 2022,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 6021.342
+    },
+    {
+      "year": 2022,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 5973.6
+    },
+    {
+      "year": 2028,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 5897.301
+    },
+    {
+      "year": 2030,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 5868.557
+    },
+    {
+      "year": 2030,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 5595.36
+    },
+    {
+      "year": 2028,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 5574.495
+    },
+    {
+      "year": 2035,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 5212.909
+    },
+    {
+      "year": 2029,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 4919.842
+    },
+    {
+      "year": 2028,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 4915.073
+    },
+    {
+      "year": 2034,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 4761.234
+    },
+    {
+      "year": 2027,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 4675.308
+    },
+    {
+      "year": 2031,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 4588.473
+    },
+    {
+      "year": 2021,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 4580.209
+    },
+    {
+      "year": 2029,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 4532.561
+    },
+    {
+      "year": 2032,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 4424.703
+    },
+    {
+      "year": 2033,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 4421.992
+    },
+    {
+      "year": 2029,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 4387.849
+    },
+    {
+      "year": 2027,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 4226.556
+    },
+    {
+      "year": 2026,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 3959.024
+    },
+    {
+      "year": 2026,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 3954.865
+    },
+    {
+      "year": 2026,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 3941.81
+    },
+    {
+      "year": 2030,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 3827.39
+    },
+    {
+      "year": 2025,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 3822.598
+    },
+    {
+      "year": 2021,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 3350.905
+    },
+    {
+      "year": 2032,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 3171.072
+    },
+    {
+      "year": 2033,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 3155.791
+    },
+    {
+      "year": 2031,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 3144.826
+    },
+    {
+      "year": 2035,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 3143.753
+    },
+    {
+      "year": 2034,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 3139.525
+    },
+    {
+      "year": 2025,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 2806.316
+    },
+    {
+      "year": 2025,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 2763.841
+    },
+    {
+      "year": 2021,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 2591.06
+    },
+    {
+      "year": 2020,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 2380.495
+    },
+    {
+      "year": 2025,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 2249.483
+    },
+    {
+      "year": 2023,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 2230.848
+    },
+    {
+      "year": 2024,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 1824.511
+    },
+    {
+      "year": 2024,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 1806.838
+    },
+    {
+      "year": 2022,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 1541.185
+    },
+    {
+      "year": 2023,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 1418.025
+    },
+    {
+      "year": 2020,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 1409.681
+    },
+    {
+      "year": 2020,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 1149.384
+    },
+    {
+      "year": 2022,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 1088.871
+    },
+    {
+      "year": 2023,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 1079.28
+    },
+    {
+      "year": 2021,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 701.471
+    },
+    {
+      "year": 2024,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 630.263
+    },
+    {
+      "year": 2021,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 497.386
+    },
+    {
+      "year": 2023,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 476.753
+    },
+    {
+      "year": 2020,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 248.539
+    },
+    {
+      "year": 2020,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 242.471
+    },
+    {
+      "year": 2021,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 226.879
+    },
+    {
+      "year": 2024,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 225.57
+    },
+    {
+      "year": 2022,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 191.253
+    },
+    {
+      "year": 2020,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 68.244
+    },
+    {
+      "year": 2021,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 30.118
+    },
+    {
+      "year": 2022,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 27.794
+    },
+    {
+      "year": 2020,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 18.852
+    }
+  ],
+  "energy_mwh": [
+    {
+      "year": 2035,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 506215.006
+    },
+    {
+      "year": 2034,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 483139.456
+    },
+    {
+      "year": 2033,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 467370.089
+    },
+    {
+      "year": 2032,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 451225.474
+    },
+    {
+      "year": 2031,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 423212.223
+    },
+    {
+      "year": 2030,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 382990.361
+    },
+    {
+      "year": 2029,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 332966.697
+    },
+    {
+      "year": 2028,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 305729.966
+    },
+    {
+      "year": 2027,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 273533.996
+    },
+    {
+      "year": 2026,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 252110.456
+    },
+    {
+      "year": 2025,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 204647.896
+    },
+    {
+      "year": 2028,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 126913.927
+    },
+    {
+      "year": 2029,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 124480.47
+    },
+    {
+      "year": 2027,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 123990.531
+    },
+    {
+      "year": 2024,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 115576.787
+    },
+    {
+      "year": 2035,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 113861.912
+    },
+    {
+      "year": 2034,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 112937.408
+    },
+    {
+      "year": 2033,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 112895.956
+    },
+    {
+      "year": 2032,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 110823.118
+    },
+    {
+      "year": 2031,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 108321.954
+    },
+    {
+      "year": 2030,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 106838.807
+    },
+    {
+      "year": 2030,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 104265.72
+    },
+    {
+      "year": 2029,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 93899.329
+    },
+    {
+      "year": 2026,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 90763.494
+    },
+    {
+      "year": 2033,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 84970.402
+    },
+    {
+      "year": 2028,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 84448.116
+    },
+    {
+      "year": 2031,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 71864.033
+    },
+    {
+      "year": 2027,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 67298.972
+    },
+    {
+      "year": 2032,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 65241.817
+    },
+    {
+      "year": 2025,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 64065.501
+    },
+    {
+      "year": 2023,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 63551.698
+    },
+    {
+      "year": 2026,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 61566.28
+    },
+    {
+      "year": 2034,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 61299.317
+    },
+    {
+      "year": 2035,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 60064.937
+    },
+    {
+      "year": 2024,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 40565.162
+    },
+    {
+      "year": 2035,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 34888.523
+    },
+    {
+      "year": 2028,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 30840.013
+    },
+    {
+      "year": 2033,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 30707.177
+    },
+    {
+      "year": 2034,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 29456.71
+    },
+    {
+      "year": 2032,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 28977.207
+    },
+    {
+      "year": 2025,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 28772.524
+    },
+    {
+      "year": 2023,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 25648.13
+    },
+    {
+      "year": 2030,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 25597.612
+    },
+    {
+      "year": 2033,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 24545.876
+    },
+    {
+      "year": 2031,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 24028.017
+    },
+    {
+      "year": 2027,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 21591.755
+    },
+    {
+      "year": 2029,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 21397.791
+    },
+    {
+      "year": 2030,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 20801.256
+    },
+    {
+      "year": 2022,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 19969.008
+    },
+    {
+      "year": 2032,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 19888.878
+    },
+    {
+      "year": 2028,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 19098.999
+    },
+    {
+      "year": 2027,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 19014.765
+    },
+    {
+      "year": 2024,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 18907.463
+    },
+    {
+      "year": 2027,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 18596.034
+    },
+    {
+      "year": 2035,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 18479.76
+    },
+    {
+      "year": 2034,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 18369.19
+    },
+    {
+      "year": 2029,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 18346.136
+    },
+    {
+      "year": 2023,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 16371.22
+    },
+    {
+      "year": 2026,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 16356.983
+    },
+    {
+      "year": 2031,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 16298.415
+    },
+    {
+      "year": 2028,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 16172.813
+    },
+    {
+      "year": 2031,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 16131.354
+    },
+    {
+      "year": 2028,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 15906.818
+    },
+    {
+      "year": 2022,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 15824.035
+    },
+    {
+      "year": 2035,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 15626.651
+    },
+    {
+      "year": 2032,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 14780.203
+    },
+    {
+      "year": 2026,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 14738.064
+    },
+    {
+      "year": 2034,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 14701.23
+    },
+    {
+      "year": 2027,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 14364.317
+    },
+    {
+      "year": 2029,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 14183.525
+    },
+    {
+      "year": 2033,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 14149.835
+    },
+    {
+      "year": 2030,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 14027.906
+    },
+    {
+      "year": 2025,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 12443.036
+    },
+    {
+      "year": 2030,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 12216.115
+    },
+    {
+      "year": 2021,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 11814.031
+    },
+    {
+      "year": 2029,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 11728.414
+    },
+    {
+      "year": 2026,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 11609.512
+    },
+    {
+      "year": 2035,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 10783.457
+    },
+    {
+      "year": 2034,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 10752.971
+    },
+    {
+      "year": 2032,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 10695.576
+    },
+    {
+      "year": 2033,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 10688.016
+    },
+    {
+      "year": 2031,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 10532.137
+    },
+    {
+      "year": 2026,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 9916.22
+    },
+    {
+      "year": 2022,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 9796.976
+    },
+    {
+      "year": 2025,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 8302.319
+    },
+    {
+      "year": 2025,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 7521.627
+    },
+    {
+      "year": 2021,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 6481.353
+    },
+    {
+      "year": 2024,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 5361.197
+    },
+    {
+      "year": 2020,
+      "region_en": "Asia-Pacific",
+      "region_zh": "亚太",
+      "value": 4783.172
+    },
+    {
+      "year": 2025,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 4756.982
+    },
+    {
+      "year": 2023,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 4372.719
+    },
+    {
+      "year": 2023,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 4064.255
+    },
+    {
+      "year": 2021,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 3929.625
+    },
+    {
+      "year": 2024,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 3789.81
+    },
+    {
+      "year": 2020,
+      "region_en": "North America",
+      "region_zh": "北美",
+      "value": 3012.582
+    },
+    {
+      "year": 2023,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 2959.892
+    },
+    {
+      "year": 2022,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 2836.299
+    },
+    {
+      "year": 2022,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 2122.978
+    },
+    {
+      "year": 2024,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 1884.453
+    },
+    {
+      "year": 2020,
+      "region_en": "Europe (EU-27)",
+      "region_zh": "欧洲（欧盟27）",
+      "value": 1769.684
+    },
+    {
+      "year": 2023,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 1263.811
+    },
+    {
+      "year": 2021,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 1245.024
+    },
+    {
+      "year": 2021,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 920.223
+    },
+    {
+      "year": 2024,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 585.176
+    },
+    {
+      "year": 2021,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 561.024
+    },
+    {
+      "year": 2020,
+      "region_en": "Africa",
+      "region_zh": "非洲",
+      "value": 362.942
+    },
+    {
+      "year": 2020,
+      "region_en": "Europe (non EU-27)",
+      "region_zh": "欧洲（非欧盟）",
+      "value": 322.55
+    },
+    {
+      "year": 2022,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 315.222
+    },
+    {
+      "year": 2020,
+      "region_en": "Latin America",
+      "region_zh": "拉丁美洲",
+      "value": 108.067
+    },
+    {
+      "year": 2022,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 95.921
+    },
+    {
+      "year": 2021,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 86.567
+    },
+    {
+      "year": 2020,
+      "region_en": "Middle East",
+      "region_zh": "中东",
+      "value": 45.422
+    }
+  ],
+  "filters_power": "Applied filters:\nES Column Select is Major region, Geography, Major siting, Siting, Duration, or Technology\nMetric is MW-ac\nConcept is Gross capacity additions\nES Legend Select is Major region\nYear is greater than or equal to 2020\nVintage is Latest forecast",
+  "filters_energy": "Applied filters:\nES Column Select is Major region, Geography, Major siting, Siting, Duration, or Technology\nMetric is MWh\nConcept is Gross capacity additions\nES Legend Select is Major region\nYear is greater than or equal to 2020\nVintage is Latest forecast"
+}

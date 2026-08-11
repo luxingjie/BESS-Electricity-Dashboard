@@ -1,6 +1,4 @@
-import { Dashboard } from "@/components/public";
-import { SetupRequired } from "@/components/system/setup-required";
-import { getPublicDashboardData } from "@/lib/data/public";
+import { renderPublicDashboardPage } from "@/lib/data/public-dashboard-page";
 
 export const dynamic = "force-dynamic";
 
@@ -9,18 +7,9 @@ export default async function HomePage({
 }: {
   searchParams: Promise<{ q?: string }>;
 }) {
-  const [{ q = "" }, data] = await Promise.all([searchParams, getPublicDashboardData()]);
-  if (!data.configured) return <SetupRequired />;
-
-  const globalRegion = data.regions.find((region) => region.region_type === "global");
-  return (
-    <Dashboard
-      regions={data.regions}
-      signals={data.signals}
-      marketMetrics={data.marketMetrics}
-      provinceTopics={data.provinceTopics}
-      activeRegion={globalRegion}
-      searchQuery={q}
-    />
-  );
+  const { q = "" } = await searchParams;
+  return renderPublicDashboardPage({
+    module: "policy",
+    searchQuery: q,
+  });
 }

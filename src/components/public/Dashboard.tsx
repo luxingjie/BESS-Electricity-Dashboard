@@ -1,4 +1,8 @@
+"use client";
+
 import type {
+  BessProjectEvent,
+  ChinaCfdAuction,
   MarketMetric,
   NormalizedStatus,
   ProvinceTopicRecordWithFields,
@@ -6,11 +10,29 @@ import type {
   Signal,
 } from "@/lib/types";
 import Link from "next/link";
+import { useEffect, useState, type KeyboardEvent, type MouseEvent } from "react";
 
-import { compareContinents, compareCountries } from "@/lib/region-order";
+import { descendantRegionIds } from "@/lib/regions/descendant-ids";
+import {
+  DASHBOARD_MODULE_META,
+  dashboardModuleFromPathname,
+  dashboardModuleHref,
+  type DashboardModule,
+} from "@/lib/regions/dashboard-modules";
 
+import { ChinaCfdAuctionTable } from "./ChinaCfdAuctionTable";
 import { ChinaProvinceMarketAtlas } from "./ChinaProvinceMarketAtlas";
-import { GlobalMarketDirectory } from "./GlobalMarketDirectory";
+import { PolicyFeed } from "./PolicyFeed";
+import { PolicyInterpretationsPanel } from "./PolicyInterpretationsPanel";
+import { ProjectsTendersPanel } from "./ProjectsTendersPanel";
+import {
+  RegionSelector,
+  type RegionSelectorProps,
+} from "./RegionDirectory";
+import { SpGlobalStorageOutlook } from "./SpGlobalStorageOutlook";
+
+export { RegionSelector };
+export type { RegionSelectorProps };
 import {
   formatDate,
   formatNullableNumber,
@@ -51,23 +73,6 @@ function regionName(region: Region | undefined): string {
 
 function regionCode(region: Region): string {
   return region.code || region.name_en || region.region_type;
-}
-
-function descendantRegionIds(regions: Region[], rootId: string): Set<string> {
-  const ids = new Set<string>([rootId]);
-  let changed = true;
-
-  while (changed) {
-    changed = false;
-    for (const region of regions) {
-      if (region.parent_id && ids.has(region.parent_id) && !ids.has(region.id)) {
-        ids.add(region.id);
-        changed = true;
-      }
-    }
-  }
-
-  return ids;
 }
 
 function scopedRegionIds(regions: Region[], activeRegion?: Region | null): Set<string> | null {
@@ -128,210 +133,56 @@ function publishedMetricsOnly(metrics: MarketMetric[]): MarketMetric[] {
   return metrics.filter((metric) => metric.is_published === true);
 }
 
-export interface RegionSelectorProps {
-  regions: Region[];
-  signals?: Signal[];
-  activeRegionId?: string | null;
-  allHref?: string;
-  getRegionHref?: RegionHref;
+function regionTypeLabel(region?: Region | null): string {
+  if (!region) return "全局";
+  switch (region.region_type) {
+    case "global":
+      return "全局";
+    case "continent":
+      return "大洲";
+    case "country":
+      return "国家";
+    case "province":
+      return "省份";
+    default:
+      return "地区";
+  }
 }
 
-export function RegionSelector({
-  regions,
-  signals = [],
-  activeRegionId,
-  allHref = "/",
-  getRegionHref = defaultRegionHref,
-}: RegionSelectorProps) {
-  const globalRegion = regions.find((region) => region.region_type === "global");
-  const continents = regions
-    .filter((region) => region.region_type === "continent")
-    .sort(compareContinents);
-  const countries = regions
-    .filter((region) => region.region_type === "country")
-    .sort(compareCountries);
-  const provinces = regions.filter((region) => region.region_type === "province");
-  const published = publishedSignalsOnly(signals);
-  const realPublished = published.filter((signal) => !isDemo(signal));
-  const demoPublished = published.filter(isDemo);
-  const activeRegion = regions.find((region) => region.id === activeRegionId);
-  const activeCountry =
-    activeRegion?.region_type === "country"
-      ? activeRegion
-      : activeRegion?.region_type === "province"
-        ? countries.find((country) => country.id === activeRegion.parent_id)
-        : undefined;
-  const activeCountryId =
-    activeCountry?.id ?? null;
-  const activeContinentId =
-    activeRegion?.region_type === "continent"
-      ? activeRegion.id
-      : activeCountry?.parent_id ?? null;
+function heroSubtitle(activeRegion?: Region | null): string {
+  if (!activeRegion || activeRegion.region_type === "global") {
+    return "情报总览";
+  }
+  if (activeRegion.region_type === "province") return "本省情报总览";
+  if (activeRegion.region_type === "country") return "本国情报总览";
+  return "区域情报总览";
+}
 
-  const countForRegion = (region: Region) => {
-    const ids = descendantRegionIds(regions, region.id);
-    return {
-      real: realPublished.filter((signal) => ids.has(signal.region_id)).length,
-      demo: demoPublished.filter((signal) => ids.has(signal.region_id)).length,
-    };
-  };
-  const globalCounts = {
-    real: realPublished.length,
-    demo: demoPublished.length,
-  };
+function heroDescription(args: {
+  activeRegion?: Region | null;
+  isChinaScope: boolean;
+}): string {
+  const { activeRegion, isChinaScope } = args;
+  if (isChinaScope) {
+    return "默认展示政策动态；点击下方模块在本页切换项目与招标、市场数据，以及电力市场与储能政策专题。";
+  }
+  if (!activeRegion || activeRegion.region_type === "global") {
+    return "默认展示政策动态；点击下方模块在本页切换内容，左侧片区可下钻到国家。";
+  }
+  return "默认展示政策动态；点击下方模块在本页切换项目与招标、市场数据。";
+}
 
-  return (
-    <nav className="gl-region-directory" aria-label="地区选择器">
-      <div className="gl-directory-label">
-        <span>Area directory</span>
-        <i aria-hidden="true" />
-      </div>
-
-      <a
-        className={`gl-region-button ${
-          !activeRegionId || activeRegionId === globalRegion?.id ? "is-active" : ""
-        }`}
-        href={globalRegion ? getRegionHref(globalRegion) : allHref}
-        aria-current={!activeRegionId || activeRegionId === globalRegion?.id ? "page" : undefined}
-        aria-label={`${globalRegion ? regionName(globalRegion) : "全局观察"}，真实 ${globalCounts.real} 条，Demo ${globalCounts.demo} 条`}
-      >
-        <span className="gl-region-dot" />
-        <span>{globalRegion ? regionName(globalRegion) : "全局观察"}</span>
-        <span className="gl-region-count">{String(globalCounts.real).padStart(2, "0")}</span>
-      </a>
-
-      <div className="gl-region-group">Continent / 大洲</div>
-      {continents.map((continent) => {
-        const continentCounts = countForRegion(continent);
-        const continentCountries = countries.filter(
-          (country) => country.parent_id === continent.id,
-        );
-        const showCountries = activeContinentId === continent.id;
-        return (
-          <div className="gl-continent-cluster" key={continent.id}>
-            <a
-              className={`gl-region-button is-continent ${
-                activeRegionId === continent.id ? "is-active" : ""
-              }`}
-              href={getRegionHref(continent)}
-              aria-current={activeRegionId === continent.id ? "page" : undefined}
-              aria-label={`${regionName(continent)}，真实 ${continentCounts.real} 条，Demo ${continentCounts.demo} 条`}
-              title={`${regionName(continent)} · Demo ${continentCounts.demo}`}
-            >
-              <span className="gl-region-dot" />
-              <span>
-                {regionName(continent)} <small>· {regionCode(continent)}</small>
-              </span>
-              <span className="gl-region-count">
-                {String(continentCounts.real).padStart(2, "0")}
-              </span>
-            </a>
-            {showCountries ? <div className="gl-country-stack">
-              {continentCountries.map((country) => {
-                const countryCounts = countForRegion(country);
-                const countryProvinces = provinces.filter(
-                  (province) => province.parent_id === country.id,
-                );
-                const showProvinces = activeCountryId === country.id;
-                return (
-                  <div className="gl-country-cluster" key={country.id}>
-                    <a
-                      className={`gl-region-button is-country ${
-                        activeRegionId === country.id ? "is-active" : ""
-                      }`}
-                      href={getRegionHref(country)}
-                      aria-current={activeRegionId === country.id ? "page" : undefined}
-                      aria-label={`${regionName(country)}，真实 ${countryCounts.real} 条，Demo ${countryCounts.demo} 条`}
-                      title={`${regionName(country)} · Demo ${countryCounts.demo}`}
-                    >
-                      <span className="gl-region-dot" />
-                      <span>
-                        {regionName(country)} <small>· {regionCode(country)}</small>
-                      </span>
-                      <span className="gl-region-count">
-                        {String(countryCounts.real).padStart(2, "0")}
-                      </span>
-                    </a>
-                    {showProvinces
-                      ? countryProvinces.map((province) => {
-                          const provinceCounts = countForRegion(province);
-                          return (
-                          <a
-                            className={`gl-region-button is-province ${
-                              activeRegionId === province.id ? "is-active" : ""
-                            }`}
-                            href={getRegionHref(province)}
-                            aria-current={
-                              activeRegionId === province.id ? "page" : undefined
-                            }
-                            aria-label={`${regionName(province)}，真实 ${provinceCounts.real} 条，Demo ${provinceCounts.demo} 条`}
-                            title={`${regionName(province)} · Demo ${provinceCounts.demo}`}
-                            key={province.id}
-                          >
-                            <span className="gl-region-dot" />
-                            <span>{regionName(province)}</span>
-                            <span className="gl-region-count">
-                              {String(provinceCounts.real).padStart(2, "0")}
-                            </span>
-                          </a>
-                          );
-                        })
-                      : null}
-                  </div>
-                );
-              })}
-            </div> : null}
-          </div>
-        );
-      })}
-
-      {countries.some((country) => !country.parent_id) ? (
-        <>
-          <div className="gl-region-group">Unassigned / 未分组国家</div>
-          {countries
-            .filter((country) => !country.parent_id)
-            .map((country) => (
-              <a
-                className={`gl-region-button is-country ${
-                  activeRegionId === country.id ? "is-active" : ""
-                }`}
-                href={getRegionHref(country)}
-                aria-current={activeRegionId === country.id ? "page" : undefined}
-                aria-label={regionName(country)}
-                key={country.id}
-              >
-                <span className="gl-region-dot" />
-                <span>{regionName(country)}</span>
-                <span className="gl-region-count">
-                  {String(countForRegion(country)).padStart(2, "0")}
-                </span>
-              </a>
-            ))}
-        </>
-      ) : null}
-
-      {provinces.some((province) => !province.parent_id) ? (
-        <>
-          <div className="gl-region-group">Province / 省级</div>
-          {provinces
-            .filter((province) => !province.parent_id)
-            .map((province) => (
-              <a
-                className={`gl-region-button ${activeRegionId === province.id ? "is-active" : ""}`}
-                href={getRegionHref(province)}
-                aria-current={activeRegionId === province.id ? "page" : undefined}
-                aria-label={regionName(province)}
-                key={province.id}
-              >
-                <span className="gl-region-dot" />
-                <span>{regionName(province)}</span>
-                <span className="gl-region-count">{String(countForRegion(province)).padStart(2, "0")}</span>
-              </a>
-            ))}
-        </>
-      ) : null}
-    </nav>
+function signalEventDay(signal: Signal): string {
+  return (signal.event_date || signal.published_at || signal.created_at || "").slice(
+    0,
+    10,
   );
+}
+
+function daysAgoIso(days: number): string {
+  const date = new Date();
+  date.setUTCDate(date.getUTCDate() - days);
+  return date.toISOString().slice(0, 10);
 }
 
 export interface SearchFormProps {
@@ -482,7 +333,11 @@ export interface DashboardProps {
   signals: Signal[];
   marketMetrics: MarketMetric[];
   provinceTopics: ProvinceTopicRecordWithFields[];
+  cfdAuctions?: ChinaCfdAuction[];
+  projectEvents?: BessProjectEvent[];
   activeRegion?: Region | null;
+  /** Content module shown under the shared hero (defaults to policy). */
+  activeModule?: DashboardModule;
   searchQuery?: string;
   searchAction?: string;
   getRegionHref?: RegionHref;
@@ -494,12 +349,46 @@ export function Dashboard({
   signals,
   marketMetrics,
   provinceTopics,
+  cfdAuctions = [],
+  projectEvents = [],
   activeRegion,
+  activeModule = "policy",
   searchQuery = "",
   searchAction,
   getRegionHref = defaultRegionHref,
   getSignalHref = defaultSignalHref,
 }: DashboardProps) {
+  // Soft-switch modules in the client so tab clicks don't re-fetch the whole
+  // dashboard RSC payload (each route is force-dynamic + Supabase).
+  const [currentModule, setCurrentModule] = useState<DashboardModule>(activeModule);
+
+  useEffect(() => {
+    setCurrentModule(activeModule);
+  }, [activeModule, activeRegion?.id]);
+
+  useEffect(() => {
+    const onPopState = () => {
+      setCurrentModule(dashboardModuleFromPathname(window.location.pathname));
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
+
+  const switchModule = (module: DashboardModule, href: string) => {
+    if (module === currentModule) return;
+    setCurrentModule(module);
+    // Replace (don't push) so Back returns to the previous place/region,
+    // not every intermediate module click.
+    window.history.replaceState({ module }, "", href);
+  };
+
+  const isModifiedClick = (event: MouseEvent) =>
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey ||
+    event.button !== 0;
+
   const regionsById = new Map(regions.map((region) => [region.id, region]));
   const regionIds = scopedRegionIds(regions, activeRegion);
   const publishedSignals = publishedSignalsOnly(signals)
@@ -516,20 +405,14 @@ export function Dashboard({
       (!regionIds || regionIds.has(record.region_id)),
   );
   const realPublishedSignals = publishedSignals.filter((signal) => !isDemo(signal));
-  const demoPublishedSignals = publishedSignals.filter(isDemo);
   const realPublishedMetrics = publishedMetrics.filter((metric) => !metric.is_demo);
-  const demoPublishedMetrics = publishedMetrics.filter((metric) => metric.is_demo);
   // Regions are structural seed/reference rows. A real Signal must never inherit
   // a Demo label only because its region was preloaded by the MVP seed.
   const hasDemoData =
     publishedSignals.some(isDemo) ||
     publishedMetrics.some((metric) => metric.is_demo) ||
     scopedProvinceTopics.some((record) => record.is_demo);
-  const statusCount = (status: string) =>
-    realPublishedSignals.filter((signal) => signal.normalized_status === status).length;
   const activeName = activeRegion ? regionName(activeRegion) : "全局观察";
-  const activeCode = activeRegion ? regionCode(activeRegion) : "GLOBAL WATCH";
-  const topSignals = publishedSignals.slice(0, 3);
   const resolvedSearchAction = searchAction || (activeRegion ? getRegionHref(activeRegion) : "/");
   const chinaRegion = regions.find(
     (region) =>
@@ -541,15 +424,85 @@ export function Dashboard({
       activeRegion &&
       (activeRegion.id === chinaRegion.id || activeRegion.parent_id === chinaRegion.id),
   );
-  const isGlobalDirectoryScope = Boolean(
-    !activeRegion ||
-      activeRegion.region_type === "global" ||
-      activeRegion.region_type === "continent",
+  const showRegionPolicyArchive = Boolean(
+    activeRegion && activeRegion.region_type !== "global",
   );
-  const demoRecordCount =
-    demoPublishedSignals.length +
-    demoPublishedMetrics.length +
-    scopedProvinceTopics.filter((record) => record.is_demo).length;
+  const recentPolicyCount = realPublishedSignals.filter(
+    (signal) => signalEventDay(signal) >= daysAgoIso(30),
+  ).length;
+  const scopedCountryCount = (() => {
+    if (!activeRegion || activeRegion.region_type === "global") {
+      return regions.filter((region) => region.region_type === "country").length;
+    }
+    if (activeRegion.region_type === "continent") {
+      return regions.filter(
+        (region) =>
+          region.region_type === "country" && region.parent_id === activeRegion.id,
+      ).length;
+    }
+    return null;
+  })();
+  const subtitle = heroSubtitle(activeRegion);
+  const description = heroDescription({
+    activeRegion,
+    isChinaScope,
+  });
+  const moduleLabel = DASHBOARD_MODULE_META[currentModule].label;
+  const moduleLinks = (
+    ["policy", "projects", "market", "topics"] as DashboardModule[]
+  )
+    .filter((module) => module !== "topics" || isChinaScope)
+    .map((module) => ({
+      key: module,
+      href: dashboardModuleHref(module, activeRegion),
+      index: DASHBOARD_MODULE_META[module].index,
+      label: DASHBOARD_MODULE_META[module].label,
+      detail:
+        module === "policy"
+          ? `${realPublishedSignals.length} 条已发布`
+          : module === "market"
+            ? `${realPublishedMetrics.length} 条指标`
+            : module === "projects"
+              ? "招标 / 中标 / 并网"
+              : DASHBOARD_MODULE_META[module].detail,
+      active: currentModule === module,
+    }));
+
+  const handleModuleTabKeyDown = (
+    event: KeyboardEvent<HTMLAnchorElement>,
+    index: number,
+  ) => {
+    let nextIndex: number | null = null;
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+      nextIndex = (index + 1) % moduleLinks.length;
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      nextIndex = (index - 1 + moduleLinks.length) % moduleLinks.length;
+    } else if (event.key === "Home") {
+      nextIndex = 0;
+    } else if (event.key === "End") {
+      nextIndex = moduleLinks.length - 1;
+    }
+    if (nextIndex === null) return;
+
+    event.preventDefault();
+    const next = moduleLinks[nextIndex];
+    // Projects route loads a large dataset; use real navigation.
+    if (next.key === "projects" || currentModule === "projects") {
+      window.location.assign(next.href);
+      return;
+    }
+    switchModule(next.key, next.href);
+    document.getElementById(`dashboard-module-tab-${next.key}`)?.focus();
+  };
+
+  const modulePanelId = (module: DashboardModule) => {
+    if (module === "policy") {
+      return showRegionPolicyArchive ? "region-policy" : "policy";
+    }
+    if (module === "projects") return "projects-tenders";
+    if (module === "market") return "market";
+    return "china-topics";
+  };
 
   return (
     <>
@@ -560,67 +513,62 @@ export function Dashboard({
       ) : null}
 
       <div className={`gl-app-shell ${hasDemoData ? "has-demo-ribbon" : ""}`}>
-        <aside className="gl-sidebar" aria-label="Grid Ledger 导航">
-          <Link className="gl-brand" href="/" aria-label="Grid Ledger 首页">
-            <div className="gl-brand-mark" aria-hidden="true" />
+        <aside className="gl-sidebar" aria-label="Jinko ESS 导航">
+          <Link className="gl-brand" href="/" aria-label="Jinko ESS 首页">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className="gl-brand-logo"
+              src="/jinko-ess-logo.png"
+              alt="Jinko ESS"
+              width={168}
+              height={102}
+            />
             <div className="gl-brand-copy">
-              <strong>
-                Grid
-                <br />
-                Ledger
-              </strong>
+              <strong>Grid Ledger</strong>
               <span>Policy × Market Intelligence</span>
             </div>
           </Link>
 
-          <nav className="gl-primary-nav" aria-label="页面区块">
-            <a className="gl-nav-button is-active" href="#overview">
+          <nav className="gl-primary-nav" aria-label="总览模块">
+            <div className="gl-directory-label">
+              <span>Dashboard</span>
+              <i aria-hidden="true" />
+            </div>
+            <Link
+              className="gl-nav-button is-active"
+              href={dashboardModuleHref("overview", activeRegion)}
+              aria-current="page"
+            >
               <span className="gl-nav-index">01</span>
-              <span>情报总览</span>
-            </a>
-            <a className="gl-nav-button" href="#market">
-              <span className="gl-nav-index">02</span>
-              <span>市场指标</span>
-            </a>
-            <a className="gl-nav-button" href="#policy">
-              <span className="gl-nav-index">03</span>
-              <span>政策动态</span>
-            </a>
-            {isChinaScope ? (
-              <a className="gl-nav-button" href="#china-market-atlas">
-                <span className="gl-nav-index">04</span>
-                <span>省级专题</span>
-              </a>
-            ) : isGlobalDirectoryScope ? (
-              <a className="gl-nav-button" href="#global-market-directory">
-                <span className="gl-nav-index">04</span>
-                <span>大洲市场</span>
-              </a>
-            ) : null}
+              <span>总览</span>
+            </Link>
           </nav>
 
           <RegionSelector
             regions={regions}
             signals={signals}
             activeRegionId={activeRegion?.id}
-            getRegionHref={getRegionHref}
           />
 
           <div className="gl-sidebar-footer">
             <div className="gl-live-row">
               <span className="gl-live-dot" />
-              <strong>Published records</strong>
+              <strong>已发布数据</strong>
             </div>
-            <span>公开端仅展示已发布数据</span>
+            <span>公开端仅展示已发布记录</span>
           </div>
         </aside>
 
-        <main className="gl-workspace" id="overview">
+        <main className="gl-workspace">
           <header className="gl-topbar">
             <div className="gl-breadcrumb">
-              <span>Dashboard</span>
+              <Link href={dashboardModuleHref("overview", activeRegion)}>
+                总览
+              </Link>
               <span>/</span>
               <strong>{activeName}</strong>
+              <span>/</span>
+              <strong>{moduleLabel}</strong>
             </div>
             <SearchForm defaultValue={searchQuery} action={resolvedSearchAction} />
             <a className="gl-view-button" href="/admin/login">
@@ -628,134 +576,189 @@ export function Dashboard({
             </a>
           </header>
 
-          <section className="gl-hero" data-index={activeRegion?.code || "01"}>
+          <section className="gl-hero" aria-labelledby="overview-title">
             <div className="gl-hero-copy">
-              <div className="gl-eyebrow">{activeCode}</div>
-              <h1>
-                {activeRegion ? activeName : "Policy moves."}
+              <div className="gl-eyebrow">{regionTypeLabel(activeRegion)}</div>
+              <h1 id="overview-title">
+                {activeName}
                 <br />
-                <em>{activeRegion ? "policy & market desk." : "Markets answer."}</em>
+                <em>{subtitle}</em>
               </h1>
-              <p className="gl-hero-description">
-                从已发布记录读取政策动态与市场指标。状态、日期、地区和原文来源彼此独立展示，草稿不会进入公开视图。
-              </p>
+              <p className="gl-hero-description">{description}</p>
             </div>
             <div className="gl-hero-meta">
               <div className="gl-meta-row">
-                <span>Real published signals</span>
-                <strong className="good">{realPublishedSignals.length}</strong>
+                <span>近30天政策</span>
+                <strong className="good">{recentPolicyCount}</strong>
               </div>
+              {scopedCountryCount != null ? (
+                <div className="gl-meta-row">
+                  <span>覆盖国家</span>
+                  <strong>{scopedCountryCount}</strong>
+                </div>
+              ) : (
+                <div className="gl-meta-row">
+                  <span>已发布政策</span>
+                  <strong>{realPublishedSignals.length}</strong>
+                </div>
+              )}
               <div className="gl-meta-row">
-                <span>Real market metrics</span>
+                <span>市场指标</span>
                 <strong>{realPublishedMetrics.length}</strong>
               </div>
-              <div className="gl-meta-row">
-                <span>Demo fixtures</span>
-                <strong>{demoRecordCount}</strong>
-              </div>
             </div>
+            <nav
+              className="gl-module-jump"
+              aria-label="内容模块"
+              role="tablist"
+            >
+              {moduleLinks.map((module, index) => (
+                <Link
+                  key={module.key}
+                  id={`dashboard-module-tab-${module.key}`}
+                  className={`gl-module-card ${module.active ? "is-active" : ""}`}
+                  href={module.href}
+                  role="tab"
+                  aria-selected={module.active}
+                  aria-controls={modulePanelId(module.key)}
+                  tabIndex={module.active ? 0 : -1}
+                  onClick={(event) => {
+                    if (isModifiedClick(event)) return;
+                    event.preventDefault();
+                    switchModule(module.key, module.href);
+                  }}
+                  onKeyDown={(event) => handleModuleTabKeyDown(event, index)}
+                >
+                  <span className="gl-nav-index">{module.index}</span>
+                  <strong>{module.label}</strong>
+                  <small>{module.detail}</small>
+                </Link>
+              ))}
+            </nav>
           </section>
 
           <div className="gl-mode-row">
-            <nav className="gl-mode-switch" aria-label="内容导航">
-              <a className="is-active" href="#overview">
-                综合视图
-              </a>
-              <a href="#policy">政策动态</a>
-              <a href="#market">市场指标</a>
-              {isChinaScope ? <a href="#china-market-atlas">省级专题</a> : null}
-              {isGlobalDirectoryScope ? <a href="#global-market-directory">大洲市场</a> : null}
-            </nav>
-            <div className="gl-asof">DATABASE-BACKED · PUBLISHED ONLY</div>
+            <div />
+            <div className="gl-asof">仅展示已发布数据 · 当前：{moduleLabel}</div>
           </div>
 
-          {isGlobalDirectoryScope ? (
-            <GlobalMarketDirectory
-              regions={regions}
-              signals={signals}
-              marketMetrics={marketMetrics}
-              activeRegionId={activeRegion?.id}
-              getRegionHref={getRegionHref}
-              representativeCountryLimit={6}
-            />
+          {currentModule === "policy" ? (
+            showRegionPolicyArchive ? (
+              <section
+                className="gl-panel gl-feed-panel"
+                id="region-policy"
+                role="tabpanel"
+                aria-labelledby="dashboard-module-tab-policy"
+              >
+                <PolicyFeed
+                  signals={signals}
+                  regions={regions}
+                  variant="region-archive"
+                  archiveRegion={activeRegion}
+                />
+                <PolicyInterpretationsPanel regions={regions} />
+              </section>
+            ) : (
+              <section
+                className="gl-panel gl-feed-panel"
+                id="policy"
+                role="tabpanel"
+                aria-labelledby="dashboard-module-tab-policy"
+              >
+                <PolicyFeed
+                  signals={signals}
+                  regions={regions}
+                  variant="global"
+                  initialRegionId=""
+                />
+                <PolicyInterpretationsPanel regions={regions} />
+              </section>
+            )
           ) : null}
 
-          {isChinaScope && chinaRegion ? (
-            <ChinaProvinceMarketAtlas
+          {currentModule === "projects" ? (
+            <ProjectsTendersPanel
               regions={regions}
-              chinaRegionId={chinaRegion.id}
-              signals={signals}
-              marketMetrics={marketMetrics}
-              provinceTopics={provinceTopics}
-              initialProvinceId={
-                activeRegion?.region_type === "province" ? activeRegion.id : undefined
+              regionIds={
+                activeRegion && activeRegion.region_type !== "global" && regionIds
+                  ? [...regionIds]
+                  : null
               }
+              includeUnknown={activeRegion?.region_type !== "province"}
             />
           ) : null}
 
-          {topSignals.length ? (
-            <section className="gl-signal-tape" aria-label="最新动态">
-              {topSignals.map((signal, index) => (
-                <a className="gl-tape-item" href={getSignalHref(signal)} key={signal.id}>
-                  <span className="gl-tape-index">{String(index + 1).padStart(2, "0")}</span>
-                  <span className="gl-tape-copy">
-                    <small>{normalizedStatusLabel(signal.normalized_status)}</small>
-                    <strong>{signal.title}</strong>
-                  </span>
-                </a>
-              ))}
+          {currentModule === "market" ? (
+            <section
+              className="gl-panel gl-market-panel"
+              id="market"
+              role="tabpanel"
+              aria-labelledby="dashboard-module-tab-market"
+            >
+              <div className="gl-panel-header">
+                <div>
+                  <div className="gl-section-kicker">04 · Market data</div>
+                  <h2>市场数据</h2>
+                </div>
+                <span className="gl-record-count">
+                  {realPublishedMetrics.length
+                    ? `${realPublishedMetrics.length} 条已发布`
+                    : "第三方展望已接入"}
+                </span>
+              </div>
+              {realPublishedMetrics.length ? (
+                <MarketMetrics
+                  metrics={realPublishedMetrics}
+                  regions={regions}
+                />
+              ) : null}
+              <SpGlobalStorageOutlook />
             </section>
           ) : null}
 
-          <MarketMetrics metrics={publishedMetrics.slice(0, 4)} regions={regions} compact />
-
-          <section className="gl-dashboard-grid" id="market">
-            <article className="gl-panel gl-market-panel">
-              <div className="gl-panel-header">
+          {currentModule === "topics" && isChinaScope && chinaRegion ? (
+            <section
+              className="gl-china-module"
+              id="china-topics"
+              role="tabpanel"
+              aria-labelledby="dashboard-module-tab-topics"
+              aria-label="电力市场与储能政策专题"
+            >
+              <div className="gl-panel-header gl-china-module-header">
                 <div>
-                  <div className="gl-section-kicker">Published market data</div>
-                  <h2>市场指标</h2>
-                </div>
-                <span className="gl-record-count">
-                  {realPublishedMetrics.length} REAL · {demoPublishedMetrics.length} DEMO
-                </span>
-              </div>
-              <MarketMetrics metrics={publishedMetrics} regions={regions} />
-            </article>
-
-            <aside className="gl-panel gl-signal-panel" aria-label="政策状态分布">
-              <div className="gl-panel-header">
-                <div>
-                  <div className="gl-section-kicker">Status ledger</div>
-                  <h2>状态分账</h2>
-                </div>
-              </div>
-              <div className="gl-status-ledger">
-                {(["filed", "approved", "draft", "effective"] as const).map((status) => (
-                  <div className="gl-status-row" key={status}>
-                    <StatusPill status={status} />
-                    <strong>{statusCount(status)}</strong>
+                  <div className="gl-section-kicker">
+                    05 · Power market &amp; storage
                   </div>
-                ))}
+                  <h2>电力市场与储能政策专题</h2>
+                </div>
+                {cfdAuctions.length ? (
+                  <nav className="gl-mode-switch" aria-label="中国专题快捷入口">
+                    <a href="#china-cfd-overview">机制电价</a>
+                    <a href="#china-cfd-auctions">竞价总表</a>
+                  </nav>
+                ) : null}
               </div>
-              <p className="gl-boundary-note">
-                Filed 不等于 Approved；Draft 不等于 Effective。状态统计仅计真实公开记录，Demo 另行标记。
-              </p>
-            </aside>
-          </section>
-
-          <section className="gl-panel gl-feed-panel" id="policy">
-            <div className="gl-panel-header">
-              <div>
-                <div className="gl-section-kicker">Published signal feed</div>
-                <h2>政策 / 市场动态</h2>
-              </div>
-              <div className="gl-record-count">
-                {String(realPublishedSignals.length).padStart(2, "0")} REAL · {String(demoPublishedSignals.length).padStart(2, "0")} DEMO
-              </div>
-            </div>
-            <SignalList signals={publishedSignals} regions={regions} getSignalHref={getSignalHref} />
-          </section>
+              <ChinaProvinceMarketAtlas
+                regions={regions}
+                chinaRegionId={chinaRegion.id}
+                signals={signals}
+                marketMetrics={marketMetrics}
+                provinceTopics={provinceTopics}
+                cfdAuctions={cfdAuctions}
+                initialProvinceId={
+                  activeRegion?.region_type === "province"
+                    ? activeRegion.id
+                    : undefined
+                }
+                initialTopicId={
+                  cfdAuctions.length
+                    ? "renewable-mechanism-price"
+                    : "trading-rules"
+                }
+              />
+              <ChinaCfdAuctionTable auctions={cfdAuctions} />
+            </section>
+          ) : null}
         </main>
       </div>
     </>

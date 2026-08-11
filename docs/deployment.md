@@ -41,11 +41,13 @@
    NEXT_PUBLIC_SUPABASE_URL
    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
    OPENAI_API_KEY
+   CRON_SECRET
+   SUPABASE_SERVICE_ROLE_KEY
    # optional; defaults to gpt-5.6-terra
    OPENAI_MODEL
    ```
 
-   兼容旧项目时可用 `NEXT_PUBLIC_SUPABASE_ANON_KEY` 代替 publishable key。`OPENAI_API_KEY` 只能作为服务端变量，不能添加 `NEXT_PUBLIC_` 前缀。不要把 service-role key 暴露给浏览器；应用运行时不需要它。
+   兼容旧项目时可用 `NEXT_PUBLIC_SUPABASE_ANON_KEY` 代替 publishable key。`OPENAI_API_KEY`、`CRON_SECRET`、`SUPABASE_SERVICE_ROLE_KEY` 只能作为服务端变量，不能添加 `NEXT_PUBLIC_` 前缀。`CRON_SECRET` 用于 Vercel Cron 调用 `/api/cron/policy-ingest` 的 Bearer 鉴权；`SUPABASE_SERVICE_ROLE_KEY` 仅供该 cron 写入 ingest 表，不要暴露给浏览器。
 
 4. 在 Supabase Storage 确认迁移创建的 `grid-ledger-imports` bucket 为 private。对象读取与写入均受管理员 RLS 约束；不要改成 public。
 

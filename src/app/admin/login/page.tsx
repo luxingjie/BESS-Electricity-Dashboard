@@ -23,7 +23,14 @@ export default async function AdminLoginPage({
     <main className="auth-page">
       <section className="auth-card">
         <div className="brand-lockup">
-          <span className="brand-orbit" aria-hidden="true" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className="brand-lockup-logo"
+            src="/jinko-ess-logo.png"
+            alt="Jinko ESS"
+            width={168}
+            height={102}
+          />
           <div>
             <strong>Grid Ledger</strong>
             <span>ADMIN REVIEW DESK</span>

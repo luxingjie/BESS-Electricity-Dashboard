@@ -16,7 +16,15 @@ function containsSearch(signal: Signal, search: string | undefined): boolean {
   }
 
   const needle = search.trim().toLocaleLowerCase();
-  return [signal.title, signal.summary, signal.category, signal.source_name]
+  return [
+    signal.title,
+    signal.summary,
+    signal.body,
+    signal.category,
+    signal.source_name,
+    signal.issuer,
+    signal.document_id,
+  ]
     .filter((value): value is string => Boolean(value))
     .some((value) => value.toLocaleLowerCase().includes(needle));
 }
@@ -114,21 +122,28 @@ export function makeSignal(overrides: Partial<Signal> = {}): Signal {
     signal_type: "policy",
     title: "DEMO 山东政策信号",
     summary: "仅用于验证发布工作流的 Demo 内容。",
+    body: "仅用于验证发布工作流的 Demo 正文要点。",
     category: "Demo",
+    policy_track: null,
+    star_mark: false,
     original_status: "Filed",
     normalized_status: "filed",
     event_date: "2026-07-22",
     effective_date: null,
+    expires_at: null,
     impact_channel: "revenue",
     impact_direction: "uncertain",
     impact_level: "medium",
     source_url: "https://example.com/demo-source",
     source_name: "Demo source",
+    issuer: "Demo issuer",
     reviewer_note: "已人工核对 Demo 条目",
+    needs_human_review: false,
     review_status: "published",
     published_at: timestamp,
     created_at: timestamp,
     updated_at: timestamp,
+    crawled_at: timestamp,
     is_demo: true,
     reviewer_id: "admin-fixture",
     reviewed_at: timestamp,

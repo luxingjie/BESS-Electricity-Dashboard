@@ -1,0 +1,202 @@
+// Mock data for local development without Supabase.
+// These records match the seed.sql structure and are marked is_demo.
+
+import type {
+  Region,
+  Signal,
+  MarketMetric,
+  ProvinceTopicRecordWithFields,
+} from "@/lib/types";
+
+const now = new Date().toISOString();
+
+function daysAgo(days: number): string {
+  const date = new Date();
+  date.setDate(date.getDate() - days);
+  return date.toISOString().slice(0, 10);
+}
+
+export const MOCK_REGIONS: Region[] = [
+  { id: "g-1", slug: "global", code: "GLOBAL", name_zh: "全球", name_en: "Global", region_type: "global", parent_id: null, is_demo: true, created_at: now, updated_at: now },
+  { id: "c-as", slug: "asia", code: "CONT-AS", name_zh: "亚洲", name_en: "Asia", region_type: "continent", parent_id: "g-1", is_demo: true, created_at: now, updated_at: now },
+  { id: "c-eu", slug: "europe", code: "CONT-EU", name_zh: "欧洲", name_en: "Europe", region_type: "continent", parent_id: "g-1", is_demo: true, created_at: now, updated_at: now },
+  { id: "c-na", slug: "north-america", code: "CONT-NA", name_zh: "北美洲", name_en: "North America", region_type: "continent", parent_id: "g-1", is_demo: true, created_at: now, updated_at: now },
+  { id: "c-sa", slug: "south-america", code: "CONT-SA", name_zh: "南美洲", name_en: "South America", region_type: "continent", parent_id: "g-1", is_demo: true, created_at: now, updated_at: now },
+  { id: "c-oc", slug: "oceania", code: "CONT-OC", name_zh: "大洋洲", name_en: "Oceania", region_type: "continent", parent_id: "g-1", is_demo: true, created_at: now, updated_at: now },
+  { id: "c-af", slug: "africa", code: "CONT-AF", name_zh: "非洲", name_en: "Africa", region_type: "continent", parent_id: "g-1", is_demo: true, created_at: now, updated_at: now },
+  { id: "cn", slug: "china", code: "CN", name_zh: "中国", name_en: "China", region_type: "country", parent_id: "c-as", is_demo: true, created_at: now, updated_at: now },
+  { id: "in", slug: "india", code: "IN", name_zh: "印度", name_en: "India", region_type: "country", parent_id: "c-as", is_demo: true, created_at: now, updated_at: now },
+  { id: "my", slug: "malaysia", code: "MY", name_zh: "马来西亚", name_en: "Malaysia", region_type: "country", parent_id: "c-as", is_demo: true, created_at: now, updated_at: now },
+  { id: "id", slug: "indonesia", code: "ID", name_zh: "印度尼西亚", name_en: "Indonesia", region_type: "country", parent_id: "c-as", is_demo: true, created_at: now, updated_at: now },
+  { id: "kr", slug: "south-korea", code: "KR", name_zh: "韩国", name_en: "South Korea", region_type: "country", parent_id: "c-as", is_demo: true, created_at: now, updated_at: now },
+  { id: "us", slug: "usa", code: "US", name_zh: "美国", name_en: "United States", region_type: "country", parent_id: "c-na", is_demo: true, created_at: now, updated_at: now },
+  { id: "uk", slug: "united-kingdom", code: "GB", name_zh: "英国", name_en: "United Kingdom", region_type: "country", parent_id: "c-eu", is_demo: true, created_at: now, updated_at: now },
+  { id: "de", slug: "germany", code: "DE", name_zh: "德国", name_en: "Germany", region_type: "country", parent_id: "c-eu", is_demo: true, created_at: now, updated_at: now },
+  { id: "jp", slug: "japan", code: "JP", name_zh: "日本", name_en: "Japan", region_type: "country", parent_id: "c-as", is_demo: true, created_at: now, updated_at: now },
+  { id: "au", slug: "australia", code: "AU", name_zh: "澳大利亚", name_en: "Australia", region_type: "country", parent_id: "c-oc", is_demo: true, created_at: now, updated_at: now },
+  { id: "cl", slug: "chile", code: "CL", name_zh: "智利", name_en: "Chile", region_type: "country", parent_id: "c-sa", is_demo: true, created_at: now, updated_at: now },
+  { id: "br", slug: "brazil", code: "BR", name_zh: "巴西", name_en: "Brazil", region_type: "country", parent_id: "c-sa", is_demo: true, created_at: now, updated_at: now },
+  { id: "mx", slug: "mexico", code: "MX", name_zh: "墨西哥", name_en: "Mexico", region_type: "country", parent_id: "c-na", is_demo: true, created_at: now, updated_at: now },
+  { id: "ca", slug: "canada", code: "CA", name_zh: "加拿大", name_en: "Canada", region_type: "country", parent_id: "c-na", is_demo: true, created_at: now, updated_at: now },
+  { id: "za", slug: "south-africa", code: "ZA", name_zh: "南非", name_en: "South Africa", region_type: "country", parent_id: "c-af", is_demo: true, created_at: now, updated_at: now },
+  { id: "cn-sd", slug: "shandong", code: "CN-SD", name_zh: "山东", name_en: "Shandong", region_type: "province", parent_id: "cn", is_demo: true, created_at: now, updated_at: now },
+  { id: "cn-gd", slug: "guangdong", code: "CN-GD", name_zh: "广东", name_en: "Guangdong", region_type: "province", parent_id: "cn", is_demo: true, created_at: now, updated_at: now },
+  { id: "cn-bj", slug: "beijing", code: "CN-BJ", name_zh: "北京", name_en: "Beijing", region_type: "province", parent_id: "cn", is_demo: true, created_at: now, updated_at: now },
+  { id: "cn-sh", slug: "shanghai", code: "CN-SH", name_zh: "上海", name_en: "Shanghai", region_type: "province", parent_id: "cn", is_demo: true, created_at: now, updated_at: now },
+  { id: "cn-zj", slug: "zhejiang", code: "CN-ZJ", name_zh: "浙江", name_en: "Zhejiang", region_type: "province", parent_id: "cn", is_demo: true, created_at: now, updated_at: now },
+  { id: "cn-js", slug: "jiangsu", code: "CN-JS", name_zh: "江苏", name_en: "Jiangsu", region_type: "province", parent_id: "cn", is_demo: true, created_at: now, updated_at: now },
+  { id: "cn-nm", slug: "inner-mongolia", code: "CN-NM", name_zh: "内蒙古", name_en: "Inner Mongolia", region_type: "province", parent_id: "cn", is_demo: true, created_at: now, updated_at: now },
+];
+
+export const MOCK_SIGNALS: Signal[] = [
+  {
+    id: "s-1", region_id: "cn-sd", signal_type: "policy", title: "山东省新型储能发展实施方案（2025-2030）",
+    summary: "山东省发布新型储能发展实施方案，明确到2025年全省新型储能装机规模达到5GW，到2030年达到10GW，重点支持锂电池储能、压缩空气储能和液流电池技术路线。",
+    body: null,
+    category: "储能规划", original_status: "已发布", normalized_status: "effective", event_date: daysAgo(5),
+    effective_date: daysAgo(5), impact_channel: "direct", impact_direction: "positive", impact_level: "high",
+    expires_at: null,
+    source_url: "https://example.com/shandong-storage-plan", source_name: "山东省能源局",
+    issuer: "山东省能源局",
+    reviewer_note: "来源可靠，内容已核实",
+    needs_human_review: false,
+    review_status: "published", published_at: now,
+    created_at: now, updated_at: now, crawled_at: now, is_demo: true, reviewed_at: now,
+  },
+  {
+    id: "s-2", region_id: "cn-gd", signal_type: "market", title: "广东电力现货市场独立储能参与交易规则（试行）",
+    summary: "广东电力交易中心发布独立储能参与现货市场交易规则，允许独立储能电站以'报量报价'方式参与日前和实时市场，明确了充放电价差结算机制。",
+    body: null,
+    category: "电力市场", original_status: "征求意见稿", normalized_status: "consultation", event_date: daysAgo(12),
+    effective_date: null, impact_channel: "market", impact_direction: "positive", impact_level: "high",
+    expires_at: null,
+    source_url: "https://example.com/gd-storage-market", source_name: "广东电力交易中心",
+    issuer: "广东电力交易中心",
+    reviewer_note: "征求意见阶段，需持续跟踪正式版",
+    needs_human_review: false,
+    review_status: "published", published_at: now,
+    created_at: now, updated_at: now, crawled_at: now, is_demo: true, reviewed_at: now,
+  },
+  {
+    id: "s-3", region_id: "us", signal_type: "policy", title: "FERC Order No. 2222 Implementation: DER Aggregation in Wholesale Markets",
+    summary: "FERC Order 2222 requires RTOs/ISOs to revise tariffs to allow distributed energy resource aggregators to participate in wholesale markets, including battery storage systems. Key compliance deadlines updated.",
+    body: null,
+    category: "联邦政策", original_status: "Final Rule", normalized_status: "effective", event_date: daysAgo(9),
+    effective_date: daysAgo(2), impact_channel: "market", impact_direction: "positive", impact_level: "high",
+    expires_at: null,
+    source_url: "https://example.com/ferc-2222", source_name: "FERC",
+    issuer: "FERC",
+    reviewer_note: "重大政策，影响全美储能市场准入",
+    needs_human_review: false,
+    review_status: "published", published_at: now,
+    created_at: now, updated_at: now, crawled_at: now, is_demo: true, reviewed_at: now,
+  },
+  {
+    id: "s-4", region_id: "de", signal_type: "market", title: "德国储能收入叠加机制更新：一次调频+日内市场联合优化",
+    summary: "德国TSO更新了储能系统在一次调频(FCR)和日内连续交易市场的联合报价规则，允许储能在同一时段参与多个市场，并优化充放电策略以实现收入叠加。",
+    body: null,
+    category: "辅助服务", original_status: "announced", normalized_status: "approved", event_date: daysAgo(18),
+    effective_date: daysAgo(1), impact_channel: "market", impact_direction: "positive", impact_level: "medium",
+    expires_at: null,
+    source_url: "https://example.com/de-storage-stacking", source_name: "Bundesnetzagentur",
+    issuer: "Bundesnetzagentur",
+    reviewer_note: "影响储能项目经济模型",
+    needs_human_review: false,
+    review_status: "published", published_at: now,
+    created_at: now, updated_at: now, crawled_at: now, is_demo: true, reviewed_at: now,
+  },
+  {
+    id: "s-5", region_id: "cn", signal_type: "policy", title: "国家能源局关于促进新型储能并网和调度运用的通知",
+    summary: "国家能源局发文要求电网企业应公平无歧视地向新型储能提供并网服务，明确新型储能调度运行规则，保障储能电站合理收益。适用于全国各省市。",
+    body: null,
+    category: "并网调度", original_status: "已发布", normalized_status: "effective", event_date: daysAgo(3),
+    effective_date: daysAgo(3), impact_channel: "direct", impact_direction: "positive", impact_level: "high",
+    expires_at: null,
+    source_url: "https://example.com/nea-storage-grid", source_name: "国家能源局",
+    issuer: "国家能源局",
+    reviewer_note: "国家层面顶层政策，影响深远",
+    needs_human_review: false,
+    review_status: "published", published_at: now,
+    created_at: now, updated_at: now, crawled_at: now, is_demo: true, reviewed_at: now,
+  },
+  {
+    id: "s-6", region_id: "au", signal_type: "policy", title: "AEMC Rule Change: Integrating energy storage systems into the NEM",
+    summary: "澳大利亚能源市场委员会更新储能系统参与国家电力市场的规则，明确双向能量流注册、结算与技术要求，降低独立储能并网门槛。",
+    body: null,
+    category: "市场规则", original_status: "Final", normalized_status: "effective", event_date: daysAgo(7),
+    effective_date: daysAgo(7), impact_channel: "market", impact_direction: "positive", impact_level: "high",
+    expires_at: null,
+    source_url: "https://example.com/aemc-storage-rule", source_name: "AEMC",
+    issuer: "AEMC",
+    reviewer_note: "亚太重点市场规则更新",
+    needs_human_review: false,
+    review_status: "published", published_at: now,
+    created_at: now, updated_at: now, crawled_at: now, is_demo: true, reviewed_at: now,
+  },
+  {
+    id: "s-7", region_id: "cl", signal_type: "policy", title: "CNE normativa: Almacenamiento en el sistema eléctrico nacional",
+    summary: "智利国家能源委员会发布储能参与电力系统的规范性文件，明确容量认列、调度优先与并网技术标准。",
+    body: null,
+    category: "并网规范", original_status: "Vigente", normalized_status: "effective", event_date: daysAgo(11),
+    effective_date: daysAgo(11), impact_channel: "direct", impact_direction: "positive", impact_level: "medium",
+    expires_at: null,
+    source_url: "https://example.com/cne-storage", source_name: "CNE",
+    issuer: "CNE",
+    reviewer_note: "拉美储能政策样本",
+    needs_human_review: false,
+    review_status: "published", published_at: now,
+    created_at: now, updated_at: now, crawled_at: now, is_demo: true, reviewed_at: now,
+  },
+];
+
+export const MOCK_METRICS: MarketMetric[] = [
+  { id: "m-1", region_id: "cn", metric_key: "installed_bess_capacity", label: "新型储能累计装机", value: 73.8, unit: "GW", period_label: "2024年", as_of_date: "2024-12-31", source_url: null, source_name: "国家能源局", notes: null, is_demo: true, is_published: true, created_at: now, updated_at: now },
+  { id: "m-2", region_id: "cn-sd", metric_key: "peak_valley_spread", label: "峰谷价差（最大）", value: 0.95, unit: "元/kWh", period_label: "2025年1月", as_of_date: "2025-01-31", source_url: null, source_name: "山东电力交易中心", notes: null, is_demo: true, is_published: true, created_at: now, updated_at: now },
+  { id: "m-3", region_id: "cn-gd", metric_key: "peak_valley_spread", label: "峰谷价差（最大）", value: 1.12, unit: "元/kWh", period_label: "2025年1月", as_of_date: "2025-01-31", source_url: null, source_name: "广东电力交易中心", notes: null, is_demo: true, is_published: true, created_at: now, updated_at: now },
+  { id: "m-4", region_id: "us", metric_key: "bess_pipeline", label: "储能项目储备", value: 480, unit: "GW", period_label: "2024年", as_of_date: "2024-12-31", source_url: null, source_name: "EIA", notes: "含规划+在建", is_demo: true, is_published: true, created_at: now, updated_at: now },
+  { id: "m-5", region_id: "de", metric_key: "bess_installed", label: "户用储能累计装机", value: 14.2, unit: "GWh", period_label: "2024年", as_of_date: "2024-12-31", source_url: null, source_name: "BSW-Solar", notes: null, is_demo: true, is_published: true, created_at: now, updated_at: now },
+];
+
+export const MOCK_PROVINCE_TOPICS: ProvinceTopicRecordWithFields[] = [
+  {
+    id: "pt-1", region_id: "cn-sd", topic_id: "trading-rules",
+    title: "山东省电力市场交易规则（储能参与）",
+    summary: "山东省现行电力中长期交易及现货市场规则中关于新型储能参与的相关条款汇总。",
+    legal_status: "effective", operational_status: "continuous",
+    valid_from: "2025-01-01", valid_to: null, as_of_date: "2025-04-01",
+    source_url: null, source_name: "山东电力交易中心",
+    source_published_at: "2024-12-20", reviewer_note: "首版录入",
+    review_status: "published", published_at: "2025-04-01T08:00:00Z",
+    reviewed_at: "2025-04-01T08:00:00Z", is_demo: true, created_at: now, updated_at: now,
+    fields: [
+      { id: "f-1", record_id: "pt-1", field_key: "spot_market_participation", value_text: "允许独立储能参与日前及实时现货市场", value_numeric: null, unit: null, coverage_status: "available", applicability: null, source_url: null, source_name: "山东电力交易中心", source_locator: "第3章第12条", evidence_excerpt: null, sort_order: 1, created_at: now, updated_at: now },
+      { id: "f-2", record_id: "pt-1", field_key: "min_capacity_requirement", value_text: "10 MW", value_numeric: 10, unit: "MW", coverage_status: "available", applicability: null, source_url: null, source_name: "山东能源监管办", source_locator: "第2章第5条", evidence_excerpt: null, sort_order: 2, created_at: now, updated_at: now },
+      { id: "f-3", record_id: "pt-1", field_key: "settlement_mechanism", value_text: "日前市场按出清价格结算", value_numeric: null, unit: null, coverage_status: "available", applicability: null, source_url: null, source_name: "山东电力交易中心", source_locator: "第5章第18条", evidence_excerpt: null, sort_order: 3, created_at: now, updated_at: now },
+    ],
+  },
+  {
+    id: "pt-2", region_id: "cn-sd", topic_id: "storage-capacity-compensation",
+    title: "山东省储能容量补偿机制",
+    summary: "山东省关于储能设施容量补偿电价及容量市场参与规则的政策梳理。",
+    legal_status: "consultation", operational_status: "simulation",
+    valid_from: null, valid_to: null, as_of_date: "2025-04-01",
+    source_url: null, source_name: "山东省发改委",
+    source_published_at: "2025-02-15", reviewer_note: "征求意见中",
+    review_status: "published", published_at: "2025-04-01T08:00:00Z",
+    reviewed_at: "2025-04-01T08:00:00Z", is_demo: true, created_at: now, updated_at: now,
+    fields: [
+      { id: "f-4", record_id: "pt-2", field_key: "compensation_price", value_text: "0.0991元/kWh（征求意见稿）", value_numeric: 0.0991, unit: "元/kWh", coverage_status: "available", applicability: null, source_url: null, source_name: "山东省发改委", source_locator: "附件1", evidence_excerpt: null, sort_order: 1, created_at: now, updated_at: now },
+      { id: "f-5", record_id: "pt-2", field_key: "duration_hours", value_text: "2小时", value_numeric: 2, unit: "小时", coverage_status: "available", applicability: null, source_url: null, source_name: "山东省发改委", source_locator: "附件1", evidence_excerpt: null, sort_order: 2, created_at: now, updated_at: now },
+    ],
+  },
+];
+
+export const MOCK_DASHBOARD_DATA = {
+  configured: true,
+  regions: MOCK_REGIONS,
+  signals: MOCK_SIGNALS,
+  marketMetrics: MOCK_METRICS,
+  provinceTopics: MOCK_PROVINCE_TOPICS,
+  cfdAuctions: [],
+  projectEvents: [],
+};

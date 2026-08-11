@@ -1,0 +1,207 @@
+.dossier {
+  margin-top: 18px;
+  padding: 14px 16px 16px;
+  border: 1px solid #d7dee6;
+  border-radius: 10px;
+  background: #f7f9fb;
+}
+
+.head {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.head > span {
+  color: #6b7280;
+  font-family: var(--atlas-mono, "IBM Plex Mono", monospace);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.head > strong {
+  color: #111111;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.head > p,
+.empty,
+.emptyInline,
+.note,
+.legacyBlock > p {
+  margin: 0;
+  color: #556159;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.empty {
+  padding: 8px 0 2px;
+}
+
+.linksBlock,
+.legacyBlock,
+.roundList {
+  margin-top: 12px;
+}
+
+.linksBlock > h4,
+.legacyBlock > h4,
+.roundList > h4 {
+  margin: 0 0 8px;
+  color: #008234;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.linkList {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.linkList li {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  gap: 8px 12px;
+  align-items: baseline;
+}
+
+.linkList em {
+  color: #6b7280;
+  font-family: var(--atlas-mono, "IBM Plex Mono", monospace);
+  font-size: 10px;
+  font-style: normal;
+}
+
+.linkList span {
+  color: #3f4a44;
+  font-size: 12px;
+}
+
+.linkList a,
+.legacyBlock a,
+.roundLinks a {
+  color: #00a040;
+  font-size: 12px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.linkList a:hover,
+.legacyBlock a:hover,
+.roundLinks a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.legacyBlock {
+  padding: 12px;
+  border: 1px solid #dce6df;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.legacyBlock dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 0 8px;
+}
+
+.legacyBlock dt {
+  color: #6b7280;
+  font-family: var(--atlas-mono, "IBM Plex Mono", monospace);
+  font-size: 10px;
+}
+
+.legacyBlock dd {
+  margin: 2px 0 0;
+  color: #111111;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.roundList {
+  display: grid;
+  gap: 10px;
+}
+
+.roundCard {
+  padding: 12px;
+  border: 1px solid #dce6df;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.roundCard > header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.roundCard > header strong {
+  color: #111111;
+  font-size: 13px;
+}
+
+.roundCard > header span {
+  color: #6b7280;
+  font-family: var(--atlas-mono, "IBM Plex Mono", monospace);
+  font-size: 10px;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+  margin: 0 0 8px;
+}
+
+.metrics dt {
+  color: #6b7280;
+  font-family: var(--atlas-mono, "IBM Plex Mono", monospace);
+  font-size: 10px;
+}
+
+.metrics dd {
+  margin: 2px 0 0;
+  color: #1f2a24;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.priceList {
+  display: grid;
+  gap: 4px;
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+  color: #1f2a24;
+  font-size: 12px;
+}
+
+.roundLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+}
+
+@media (max-width: 720px) {
+  .linkList li {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .legacyBlock dl,
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+}

@@ -21,7 +21,7 @@ export default async function SignalPage({
       signal={signal}
       region={region}
       backHref={region && region.region_type !== "global" ? `/regions/${region.slug}` : "/"}
-      regionHref={region && region.region_type !== "global" ? `/regions/${region.slug}` : "/"}
+      regionHref={region && region.region_type !== "global" ? `/regions/${region.slug}#region-policy` : "/"}
     />
   );
 }

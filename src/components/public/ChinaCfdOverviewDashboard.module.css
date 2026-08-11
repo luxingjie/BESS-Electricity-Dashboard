@@ -1,0 +1,331 @@
+/* Chart series aligned to Jinko ESS logo: primary green + accent lime. */
+.dashboard {
+  --mck-navy: var(--gl-signal-deep, #008234);
+  --mck-blue: var(--gl-signal, #00a040);
+  --mck-cyan: var(--gl-accent, #60a848);
+  --mck-coral: #9f321f;
+  --mck-gray: #6b7280;
+  --mck-paper: #f5f9f5;
+  --strike-wind: var(--gl-signal, #00a040);
+  --strike-solar: #b7d99a;
+  --strike-coal: #9f321f;
+  padding: 18px clamp(20px, 2.6vw, 36px) 20px;
+  border-bottom: 1px solid var(--atlas-rule-strong);
+  background: linear-gradient(180deg, var(--mck-paper) 0%, #ffffff 56%);
+  animation: atlasEnter 420ms both;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.header > div > span,
+.panelHead > div > span {
+  color: var(--mck-gray);
+  font-family: var(--atlas-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.header h3,
+.panelHead h4 {
+  margin: 4px 0 0;
+  color: var(--mck-navy);
+  font-family: var(--atlas-display);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+
+.header h3 {
+  font-size: 20px;
+  line-height: 1.1;
+}
+
+.header p,
+.panelHead p {
+  max-width: 560px;
+  margin: 6px 0 0;
+  color: #556159;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.jumpLink {
+  flex: 0 0 auto;
+  color: var(--mck-blue);
+  font-family: var(--atlas-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+}
+
+.jumpLink:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 0 14px;
+}
+
+.kpiGrid > div {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid #d7dee6;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.kpiGrid dt {
+  color: var(--mck-gray);
+  font-family: var(--atlas-mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+}
+
+.kpiGrid dd {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin: 0;
+  color: var(--mck-navy);
+  font-family: var(--atlas-mono);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.kpiGrid small {
+  color: #8b949e;
+  font-family: var(--atlas-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.panel {
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid #d7dee6;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.panelHead {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.panelHead h4 {
+  font-size: 15px;
+}
+
+.panelHead p {
+  margin: 0;
+  font-size: 11px;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--mck-gray);
+  font-family: var(--atlas-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+
+.legend > span::before {
+  width: 10px;
+  height: 6px;
+  border-radius: 1px;
+  content: "";
+}
+
+.legend > span[data-tone="wind"]::before {
+  background: var(--strike-wind);
+}
+
+.legend > span[data-tone="solar"]::before {
+  background: var(--strike-solar);
+}
+
+.legend > span[data-tone="coal"]::before {
+  width: 2px;
+  height: 10px;
+  border-radius: 0;
+  background: var(--strike-coal);
+}
+
+.chartScroll {
+  max-height: 520px;
+  overflow: auto;
+}
+
+.strikeList {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.strikeRow {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  padding: 5px 2px;
+  border: 0;
+  border-radius: 4px;
+  color: inherit;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background 140ms ease;
+}
+
+.strikeRow:hover,
+.strikeRow:focus-visible {
+  background: #eef3f8;
+}
+
+.strikeLabel {
+  color: #111111;
+  font-family: var(--atlas-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.strikeBars {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  align-content: center;
+  min-width: 0;
+  padding-right: 56px;
+}
+
+.barLine {
+  position: relative;
+  display: block;
+  height: 10px;
+  min-width: 0;
+}
+
+.barWind,
+.barSolar {
+  display: block;
+  height: 9px;
+  margin-top: 1px;
+  max-width: 100%;
+  border-radius: 1px;
+}
+
+.barWind {
+  background: var(--strike-wind);
+}
+
+.barSolar {
+  background: var(--strike-solar);
+}
+
+.barTip {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  padding-left: 6px;
+  font-family: var(--atlas-mono);
+  font-size: 11px;
+  font-weight: 700;
+  font-style: normal;
+  letter-spacing: 0;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.barTip[data-tone="wind"] {
+  color: var(--gl-signal-deep, #008234);
+}
+
+.barTip[data-tone="solar"] {
+  color: #5a7d45;
+}
+
+.coalMarker {
+  position: absolute;
+  top: -1px;
+  bottom: -1px;
+  width: 0;
+  border-left: 2px dashed var(--strike-coal);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.footnote,
+.empty {
+  margin: 8px 0 0;
+  color: #6b746d;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.empty {
+  padding: 24px 0;
+  text-align: center;
+}
+
+@keyframes atlasEnter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@container (max-width: 980px) {
+  .kpiGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@container (max-width: 600px) {
+  .kpiGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard {
+    padding-inline: 16px;
+  }
+
+  .strikeRow {
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+}

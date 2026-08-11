@@ -19,7 +19,7 @@ export default async function AdminProvinceTopicsPage() {
       <header className="admin-page-header">
         <div>
           <span className="section-kicker">China province topic ledger</span>
-          <h1>省级七专题</h1>
+          <h1>省级八专题</h1>
           <p>
             这里维护前端中国省份专题矩阵的数据。它与 Signal
             事件流、通用市场指标相互独立，只有人工发布后的专题字段才会进入公开页。

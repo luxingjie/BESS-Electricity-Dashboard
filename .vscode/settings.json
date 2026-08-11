@@ -1,0 +1,11 @@
+{
+  "remote.autoForwardPorts": true,
+  "remote.autoForwardPortsSource": "hybrid",
+  "remote.portsAttributes": {
+    "3000": {
+      "label": "Grid Ledger (Next.js)",
+      "onAutoForward": "notify",
+      "elevateIfNeeded": false
+    }
+  }
+}

@@ -275,13 +275,13 @@
 }
 
 .stepRail .stepDone {
-  color: #245b36;
+  color: var(--gl-signal-deep);
   background: #edf7e9;
 }
 
 .stepRail .stepDone span {
   border-color: var(--gl-signal);
-  color: #245b36;
+  color: var(--gl-signal-deep);
   background: #ffffff;
 }
 
@@ -298,7 +298,7 @@
 }
 
 .boundaryNote strong {
-  color: #245b36;
+  color: var(--gl-signal-deep);
   font-family: var(--gl-font-mono);
   font-size: 9px;
   letter-spacing: 0.07em;
@@ -437,7 +437,7 @@
 }
 
 .importTable td a {
-  color: #245b36;
+  color: var(--gl-signal-deep);
   font-family: var(--gl-font-mono);
   font-size: 9px;
   text-decoration: none;
@@ -485,11 +485,11 @@
 .toneNeutral { color: #555a56; background: #f7f7f3; }
 .toneProcessing { color: #315ba5; background: #f1f5ff; }
 .toneReview { color: #795100; background: #fff9e8; }
-.toneSuccess { color: #245b36; background: #edf7e9; }
+.toneSuccess { color: var(--gl-signal-deep); background: #edf7e9; }
 .toneWarning { color: #795100; background: #fff4d2; }
 .toneDanger { color: #9f321f; background: #fff2ef; }
 
-.countSuccess { color: #245b36; }
+.countSuccess { color: var(--gl-signal-deep); }
 .countFailed { color: #9f321f; font-weight: 700; }
 
 .emptyList,
@@ -549,7 +549,7 @@
 .jobLead code {
   display: block;
   margin-top: 15px;
-  color: #245b36;
+  color: var(--gl-signal-deep);
   font-family: var(--gl-font-mono);
   font-size: 9px;
   line-height: 1.65;
@@ -825,7 +825,7 @@
   font-size: 8px;
 }
 
-.mappingReady { color: #245b36; }
+.mappingReady { color: var(--gl-signal-deep); }
 .mappingMissing { color: #9f321f; }
 .mappingOptional { color: #666b67; }
 
@@ -1057,7 +1057,7 @@
 
 .evidenceButton > span,
 .evidenceActive > span {
-  color: #245b36;
+  color: var(--gl-signal-deep);
   font-family: var(--gl-font-mono);
   font-size: 8px;
 }
@@ -1120,7 +1120,7 @@
 
 .readyNotice {
   border-left: 2px solid var(--gl-signal);
-  color: #245b36;
+  color: var(--gl-signal-deep);
   background: #edf7e9;
 }
 
@@ -1196,7 +1196,7 @@
 .changedFlag {
   padding: 2px 5px;
   border: 1px solid var(--gl-rule-strong);
-  color: #245b36;
+  color: var(--gl-signal-deep);
   background: #edf7e9;
   font-family: var(--gl-font-mono);
   font-size: 7px;

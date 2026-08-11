@@ -260,12 +260,69 @@ export const CHINA_MARKET_TOPICS = [
       },
     ],
   },
+  {
+    id: "renewable-mechanism-price",
+    index: "08",
+    shortLabel: "机制电价",
+    title: "风光机制电价（136号文）",
+    description:
+      "承接发改价格〔2025〕136号文的省级机制电价方案。存量与增量项目、机制电量规模、执行期限与差价结算规则分别记录，不混用口径。",
+    sourceDocument: {
+      label: "发改价格〔2025〕136号文",
+      href: "https://www.ndrc.gov.cn/xxgk/zcfb/tz/202502/t20250209_1396066.html",
+      title:
+        "国家发展改革委 国家能源局《关于深化新能源上网电价市场化改革 促进新能源高质量发展的通知》",
+    },
+    fields: [
+      {
+        key: "provincial_implementation_rule",
+        label: "省级承接文件",
+        description: "承接136号文的省级实施方案名称、发文号与状态。",
+        valueKind: "text",
+      },
+      {
+        key: "existing_project_mechanism_price",
+        label: "存量项目机制电价",
+        description: "存量风光项目机制电价水平、电量口径及与燃煤基准价的衔接方式。",
+        valueKind: "amount",
+      },
+      {
+        key: "incremental_project_mechanism_price",
+        label: "增量项目机制电价",
+        description: "竞价形成的出清价格，或公布的竞价上限 / 下限及原始单位。",
+        valueKind: "amount",
+      },
+      {
+        key: "mechanism_volume_scale",
+        label: "机制电量规模",
+        description: "纳入机制的电量规模、比例或规模确定方式。",
+        valueKind: "text",
+      },
+      {
+        key: "execution_period",
+        label: "执行期限",
+        description: "机制电价执行期限及起止安排。",
+        valueKind: "duration",
+      },
+      {
+        key: "settlement_rule",
+        label: "差价结算规则",
+        description: "机制电价与市场交易均价的差价结算（多退少补）及费用疏导方式。",
+        valueKind: "text",
+      },
+    ],
+  },
 ] as const satisfies readonly {
   id: string;
   index: string;
   shortLabel: string;
   title: string;
   description: string;
+  sourceDocument?: {
+    label: string;
+    href: string;
+    title?: string;
+  };
   fields: readonly ChinaMarketFieldDefinition[];
 }[];
 

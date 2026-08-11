@@ -2,6 +2,9 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type {
   AdminSignalQuery,
+  BessProjectEventRepository,
+  CfdAuctionRepository,
+  CreateCfdAuctionRecord,
   CreateMarketMetricRecord,
   CreateProvinceTopicField,
   CreateProvinceTopicRecord,
@@ -9,16 +12,22 @@ import type {
   MarketMetricRepository,
   AdminProvinceTopicQuery,
   ProvinceTopicRepository,
+  PublicBessProjectEventPage,
+  PublicBessProjectEventQuery,
   PublicMarketMetricQuery,
   PublicProvinceTopicQuery,
   PublicSignalQuery,
   RegionRepository,
   SignalRepository,
+  UpdateCfdAuctionRecord,
   UpdateMarketMetricRecord,
   UpdateProvinceTopicRecord,
   UpdateSignalRecord,
 } from "./contracts";
 import type {
+  BessAwardCandidate,
+  BessProjectEvent,
+  ChinaCfdAuction,
   MarketMetric,
   ProvinceTopicField,
   ProvinceTopicRecord,
@@ -33,19 +42,29 @@ const PUBLIC_SIGNAL_COLUMNS = [
   "signal_type",
   "title",
   "summary",
+  "body",
   "category",
+  "policy_track",
+  "star_mark",
   "original_status",
   "normalized_status",
   "event_date",
   "effective_date",
+  "expires_at",
   "impact_channel",
   "impact_direction",
   "impact_level",
   "source_url",
   "source_name",
+  "issuer",
+  "document_id",
+  "ai_importance",
+  "needs_human_review",
   "reviewer_note",
   "review_status",
   "published_at",
+  "reviewed_at",
+  "crawled_at",
   "is_demo",
   "created_at",
   "updated_at",
@@ -91,7 +110,16 @@ function matchesSearch(signal: Signal, search?: string) {
   const needle = search?.trim().toLocaleLowerCase("zh-CN");
   if (!needle) return true;
 
-  return [signal.title, signal.summary, signal.category, signal.original_status, signal.source_name]
+  return [
+    signal.title,
+    signal.summary,
+    signal.body,
+    signal.category,
+    signal.original_status,
+    signal.source_name,
+    signal.issuer,
+    signal.document_id,
+  ]
     .filter((value): value is string => Boolean(value))
     .some((value) => value.toLocaleLowerCase("zh-CN").includes(needle));
 }
@@ -251,6 +279,67 @@ export class SupabaseMarketMetricRepository implements MarketMetricRepository {
   }
 }
 
+export class SupabaseCfdAuctionRepository implements CfdAuctionRepository {
+  constructor(private readonly client: SupabaseClient) {}
+
+  async listAdmin(): Promise<ChinaCfdAuction[]> {
+    const { data, error } = await this.client
+      .from("china_cfd_auctions")
+      .select("*")
+      .order("grid_region")
+      .order("province_label")
+      .order("delivery_year", { ascending: true, nullsFirst: false });
+    throwIfError("list admin cfd auctions", error);
+    return (data ?? []) as ChinaCfdAuction[];
+  }
+
+  async listPublic(): Promise<ChinaCfdAuction[]> {
+    const { data, error } = await this.client
+      .from("china_cfd_auctions")
+      .select("*")
+      .eq("is_published", true)
+      .order("grid_region")
+      .order("province_label")
+      .order("delivery_year", { ascending: true, nullsFirst: false });
+    throwIfError("list published cfd auctions", error);
+    return (data ?? []) as ChinaCfdAuction[];
+  }
+
+  async getAdminById(id: string): Promise<ChinaCfdAuction | null> {
+    const { data, error } = await this.client
+      .from("china_cfd_auctions")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
+    throwIfError("read admin cfd auction", error);
+    return (data as ChinaCfdAuction | null) ?? null;
+  }
+
+  async create(input: CreateCfdAuctionRecord): Promise<ChinaCfdAuction> {
+    const { data, error } = await this.client
+      .from("china_cfd_auctions")
+      .insert(input)
+      .select("*")
+      .single();
+    throwIfError("create cfd auction", error);
+    return data as ChinaCfdAuction;
+  }
+
+  async update(
+    id: string,
+    input: UpdateCfdAuctionRecord,
+  ): Promise<ChinaCfdAuction> {
+    const { data, error } = await this.client
+      .from("china_cfd_auctions")
+      .update(input)
+      .eq("id", id)
+      .select("*")
+      .single();
+    throwIfError("update cfd auction", error);
+    return data as ChinaCfdAuction;
+  }
+}
+
 export class SupabaseProvinceTopicRepository
   implements ProvinceTopicRepository
 {
@@ -381,5 +470,225 @@ export class SupabaseProvinceTopicRepository
       ...record,
       fields: fieldsByRecord.get(record.id) ?? [],
     }));
+  }
+}
+
+export class SupabaseBessProjectEventRepository
+  implements BessProjectEventRepository
+{
+  constructor(private readonly client: SupabaseClient) {}
+
+  async listPublicPage(
+    query: PublicBessProjectEventQuery = {},
+  ): Promise<PublicBessProjectEventPage> {
+    const page = Math.max(1, query.page ?? 1);
+    const pageSize = Math.max(1, Math.min(query.page_size ?? 15, 30));
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+
+    const typedCount = async (eventType?: BessProjectEvent["event_type"]) => {
+      let builder = this.client
+        .from("bess_project_events")
+        .select("id", { count: "exact", head: true })
+        .eq("is_published", true);
+      builder = this.applyPublicFilters(builder, {
+        ...query,
+        event_type: undefined,
+      });
+      if (eventType) builder = builder.eq("event_type", eventType);
+      const { count, error } = await builder;
+      throwIfError("count bess project events", error);
+      return count ?? 0;
+    };
+
+    const [all, tender, award, commissioning] = await Promise.all([
+      typedCount(),
+      typedCount("tender"),
+      typedCount("award"),
+      typedCount("commissioning"),
+    ]);
+
+    let listQuery = this.client
+      .from("bess_project_events")
+      .select("*")
+      .eq("is_published", true)
+      .order("event_date", { ascending: false })
+      .order("created_at", { ascending: false })
+      .range(from, to);
+    listQuery = this.applyPublicFilters(listQuery, query);
+
+    const { data, error } = await listQuery;
+    throwIfError("list published bess project events page", error);
+    const items = (data ?? []) as BessProjectEvent[];
+
+    // List payload only needs the primary candidate for award rows.
+    // Full candidate lists load on demand via getPublicById.
+    const awardIds = items
+      .filter((event) => event.event_type === "award")
+      .map((event) => event.id);
+    const candidatesByEvent = new Map<string, BessAwardCandidate[]>();
+    if (awardIds.length) {
+      const { data: candidates, error: candidateError } = await this.client
+        .from("bess_award_candidates")
+        .select("*")
+        .in("event_id", awardIds)
+        .or("is_primary.eq.true,rank_order.eq.1")
+        .order("rank_order", { ascending: true, nullsFirst: false });
+      throwIfError("list page bess award candidates", candidateError);
+      for (const candidate of (candidates ?? []) as BessAwardCandidate[]) {
+        const existing = candidatesByEvent.get(candidate.event_id);
+        if (existing?.length) continue;
+        candidatesByEvent.set(candidate.event_id, [candidate]);
+      }
+    }
+
+    const sources = [
+      ...new Set(
+        items
+          .map((event) => event.source_name)
+          .filter((value): value is string => Boolean(value)),
+      ),
+    ];
+    if (!sources.length) {
+      sources.push("CESA储能应用分会");
+    }
+
+    const total = query.event_type
+      ? query.event_type === "tender"
+        ? tender
+        : query.event_type === "award"
+          ? award
+          : commissioning
+      : all;
+
+    return {
+      items: items.map((event) => ({
+        ...event,
+        candidates: candidatesByEvent.get(event.id) ?? [],
+      })),
+      total,
+      page,
+      page_size: pageSize,
+      counts: { all, tender, award, commissioning },
+      sources,
+    };
+  }
+
+  private applyPublicFilters<T extends Record<string, any>>(
+    builder: T,
+    query: PublicBessProjectEventQuery,
+  ): T {
+    let next: any = builder;
+    if (query.event_type) next = next.eq("event_type", query.event_type);
+    if (query.province_label) {
+      next = next.eq("province_label", query.province_label);
+    }
+    if (query.scene) next = next.eq("scene", query.scene);
+    if (query.plant_type) next = next.eq("plant_type", query.plant_type);
+    if (query.date_from) next = next.gte("event_date", query.date_from);
+    if (query.date_to) next = next.lte("event_date", query.date_to);
+    if (query.region_ids?.length) {
+      const ids = query.region_ids.join(",");
+      next =
+        query.include_unknown === false
+          ? next.in("region_id", query.region_ids)
+          : next.or(`region_id.in.(${ids}),region_id.is.null`);
+    }
+    const search = query.search?.trim();
+    if (search) {
+      const escaped = search.replace(/[%_,()]/g, " ").replace(/"/g, "");
+      next = next.or(
+        [
+          `title.ilike.%${escaped}%`,
+          `owner_name.ilike.%${escaped}%`,
+          `owner_group.ilike.%${escaped}%`,
+          `scope_label.ilike.%${escaped}%`,
+          `province_raw.ilike.%${escaped}%`,
+        ].join(","),
+      );
+    }
+    return next as T;
+  }
+
+  async listPublicAnalytics(
+    query: PublicBessProjectEventQuery = {},
+  ): Promise<import("../bess-projects/analytics").BessProjectAnalytics> {
+    const { data, error } = await this.client.rpc(
+      "bess_project_events_analytics",
+      {
+        p_event_type: query.event_type ?? null,
+        p_province: query.province_label ?? null,
+        p_scene: query.scene ?? null,
+        p_plant_type: query.plant_type ?? null,
+        p_search: query.search?.trim() || null,
+        p_region_ids: query.region_ids?.length ? query.region_ids : null,
+        p_include_unknown: query.include_unknown !== false,
+        p_date_from: query.date_from ?? null,
+        p_date_to: query.date_to ?? null,
+      },
+    );
+    throwIfError("bess project events analytics", error);
+
+    const payload = (data ?? {}) as {
+      sample_size?: number;
+      counts?: {
+        all?: number;
+        tender?: number;
+        award?: number;
+        commissioning?: number;
+      };
+      by_month?: import("../bess-projects/analytics").AnalyticsBucket[];
+      by_province?: import("../bess-projects/analytics").AnalyticsBucket[];
+      by_scene?: import("../bess-projects/analytics").AnalyticsBucket[];
+      by_duration?: import("../bess-projects/analytics").AnalyticsBucket[];
+      by_scope?: import("../bess-projects/analytics").AnalyticsBucket[];
+      date_min?: string | null;
+      date_max?: string | null;
+    };
+
+    return {
+      sample_size: payload.sample_size ?? 0,
+      counts: {
+        all: payload.counts?.all ?? 0,
+        tender: payload.counts?.tender ?? 0,
+        award: payload.counts?.award ?? 0,
+        commissioning: payload.counts?.commissioning ?? 0,
+      },
+      by_month: payload.by_month ?? [],
+      by_province: payload.by_province ?? [],
+      by_scene: payload.by_scene ?? [],
+      by_duration: payload.by_duration ?? [],
+      by_scope: payload.by_scope ?? [],
+      date_min: payload.date_min ?? null,
+      date_max: payload.date_max ?? null,
+    };
+  }
+
+  async getPublicById(id: string): Promise<BessProjectEvent | null> {
+    const { data, error } = await this.client
+      .from("bess_project_events")
+      .select("*")
+      .eq("id", id)
+      .eq("is_published", true)
+      .maybeSingle();
+    throwIfError("get published bess project event", error);
+    if (!data) return null;
+
+    const event = data as BessProjectEvent;
+    if (event.event_type !== "award") {
+      return { ...event, candidates: [] };
+    }
+
+    const { data: candidates, error: candidateError } = await this.client
+      .from("bess_award_candidates")
+      .select("*")
+      .eq("event_id", id)
+      .order("rank_order", { ascending: true, nullsFirst: false });
+    throwIfError("list bess award candidates for detail", candidateError);
+
+    return {
+      ...event,
+      candidates: (candidates ?? []) as BessAwardCandidate[],
+    };
   }
 }

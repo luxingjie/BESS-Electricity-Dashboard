@@ -51,26 +51,49 @@ export interface Signal {
   region_id: string | null;
   signal_type: SignalType;
   title: string | null;
+  /** Short lead / one-paragraph abstract. */
   summary: string | null;
+  /** Fuller policy main text / key points (distinct from summary). */
+  body: string | null;
   category: string | null;
   original_status: string | null;
   normalized_status: NormalizedStatus | null;
   event_date: string | null;
   effective_date: string | null;
+  /** Policy expiry / repeal date when known. */
+  expires_at: string | null;
   impact_channel: string | null;
   impact_direction: string | null;
   impact_level: string | null;
   source_url: string | null;
+  /** Feed / site label for the source page. */
   source_name: string | null;
+  /** Issuing agency or authority (may differ from source_name). */
+  issuer: string | null;
   reviewer_note: string | null;
   review_status: ReviewStatus;
+  /** Explicit queue flag for drafts that still need a human. */
+  needs_human_review: boolean;
   published_at: string | null;
   created_at: string;
   updated_at: string;
+  /** When the source document was fetched / ingested. */
+  crawled_at: string | null;
   is_demo: boolean;
   reviewer_id?: string | null;
   reviewed_at: string | null;
   created_by?: string | null;
+  /** Whitelist feed that produced this AI draft (policy ingest). */
+  feed_id?: string | null;
+  ingest_run_id?: string | null;
+  content_hash?: string | null;
+  ai_importance?: number | null;
+  /** Official document / docket / file number when known. */
+  document_id?: string | null;
+  /** Dual-track label from AI ingest (persisted). */
+  policy_track?: "storage_power_market" | "esg" | "both" | "none" | null;
+  /** High-impact star; drives public （***） marker with auto-publish threshold. */
+  star_mark?: boolean;
 }
 
 export interface MarketMetric {
@@ -177,6 +200,126 @@ export interface ProvinceTopicRecordWithFields extends ProvinceTopicRecord {
   fields: ProvinceTopicField[];
 }
 
+/**
+ * One province-level grid area x auction round in the China wind/solar CfD
+ * (mechanism price, NDRC Doc 136) master table. NULL numeric values mean
+ * "not published" and are never coerced to zero.
+ */
+export interface ChinaCfdAuction {
+  id: string;
+  region_id: string;
+  province_label: string;
+  province_label_en: string | null;
+  grid_region: string | null;
+  auction_round: string | null;
+  announcement_date: string | null;
+  delivery_year: number | null;
+  commissioning_window: string | null;
+  status: string | null;
+  pot_design: string | null;
+  onshore_wind_floor: number | null;
+  onshore_wind_cap: number | null;
+  onshore_wind_strike: number | null;
+  offshore_wind_floor: number | null;
+  offshore_wind_cap: number | null;
+  offshore_wind_strike: number | null;
+  solar_floor: number | null;
+  solar_cap: number | null;
+  solar_strike: number | null;
+  coal_benchmark: number | null;
+  target_volume_gwh: number | null;
+  awarded_volume_gwh: number | null;
+  subscription_rate: number | null;
+  onshore_wind_target_gwh: number | null;
+  onshore_wind_awarded_gwh: number | null;
+  offshore_wind_target_gwh: number | null;
+  offshore_wind_awarded_gwh: number | null;
+  solar_target_gwh: number | null;
+  solar_awarded_gwh: number | null;
+  duration_years_onshore: number | null;
+  duration_years_offshore: number | null;
+  duration_years_solar: number | null;
+  note: string | null;
+  source_url: string | null;
+  source_name: string | null;
+  implementation_plan_url: string | null;
+  implementation_plan_name: string | null;
+  announcement_url: string | null;
+  announcement_name: string | null;
+  supplemental_url: string | null;
+  supplemental_name: string | null;
+  legacy_coverage_ratio: number | null;
+  legacy_strike: number | null;
+  legacy_duration_years: number | null;
+  legacy_note: string | null;
+  legacy_url: string | null;
+  is_demo: boolean;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Storage project feed track: tender notice, award notice, or commissioning. */
+export type BessProjectEventType = "tender" | "award" | "commissioning";
+
+export interface BessAwardCandidate {
+  id: string;
+  event_id: string;
+  rank_label: string;
+  rank_order: number | null;
+  candidate_name: string;
+  candidate_group: string | null;
+  bid_amount_wan: number | null;
+  unit_price_yuan_per_wh: number | null;
+  is_primary: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * One tender / award / commissioning event for the public 项目与招标 module.
+ * NULL numerics mean unknown and must never be coerced to zero.
+ * region_id null + province_label 「未知」 means unmapped / multi-province.
+ */
+export interface BessProjectEvent {
+  id: string;
+  event_type: BessProjectEventType;
+  title: string;
+  event_date: string;
+  region_id: string | null;
+  province_label: string;
+  province_raw: string | null;
+  city_raw: string | null;
+  region_bloc: string | null;
+  power_mw: number | null;
+  energy_mwh: number | null;
+  duration_h: number | null;
+  duration_band: string | null;
+  scale_label: string | null;
+  c_rate: number | null;
+  scene: string | null;
+  plant_type: string | null;
+  technology: string | null;
+  owner_name: string | null;
+  owner_group: string | null;
+  counterparty_name: string | null;
+  scope_label: string | null;
+  status_label: string | null;
+  summary: string | null;
+  budget_wan: number | null;
+  unit_price_cap_yuan_per_wh: number | null;
+  result_date: string | null;
+  source_name: string;
+  source_batch: string;
+  source_row_hash: string;
+  raw: Record<string, unknown>;
+  is_demo: boolean;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+  candidates?: BessAwardCandidate[];
+}
+
 export type ActorRole = "admin" | "reviewer" | "viewer";
 
 export interface Actor {
@@ -184,3 +327,8 @@ export interface Actor {
   role: ActorRole;
   email?: string;
 }
+
+export type {
+  PolicyInterpretation,
+  PolicyInterpretationPublic,
+} from "@/lib/policy-interpretations/types";

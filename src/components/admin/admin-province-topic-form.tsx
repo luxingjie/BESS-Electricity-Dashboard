@@ -275,7 +275,7 @@ export function AdminProvinceTopicForm({ regions, record }: Props) {
             </select>
           </label>
           <label>
-            <span>七大专题 *</span>
+            <span>八大专题 *</span>
             <select
               name="topic_id"
               value={topicId}
@@ -559,7 +559,7 @@ export function AdminProvinceTopicForm({ regions, record }: Props) {
               disabled={busy}
               onClick={() => transition("publish")}
             >
-              发布到七专题前端
+              发布到专题前端
             </button>
             <button
               type="button"

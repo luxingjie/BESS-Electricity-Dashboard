@@ -17,16 +17,17 @@ const EXPECTED_TOPIC_IDS = [
   "storage-operating-costs",
   "green-power-direct-connection",
   "retail-rules",
+  "renewable-mechanism-price",
 ];
 
 describe("China provincial market atlas taxonomy", () => {
-  it("defines seven distinct topics and 217 province-topic cells", () => {
+  it("defines eight distinct topics and 248 province-topic cells", () => {
     expect(CHINA_MARKET_TOPICS.map((topic) => topic.id)).toEqual(
       EXPECTED_TOPIC_IDS,
     );
     expect(CHINA_MARKET_TOPIC_IDS).toEqual(EXPECTED_TOPIC_IDS);
-    expect(new Set(CHINA_MARKET_TOPICS.map((topic) => topic.id)).size).toBe(7);
-    expect(31 * CHINA_MARKET_TOPICS.length).toBe(217);
+    expect(new Set(CHINA_MARKET_TOPICS.map((topic) => topic.id)).size).toBe(8);
+    expect(31 * CHINA_MARKET_TOPICS.length).toBe(248);
   });
 
   it("keeps requested subfields and separates revenue from grid cost", () => {
@@ -61,6 +62,15 @@ describe("China provincial market atlas taxonomy", () => {
     expect(
       topicsById.get("fourth-regulatory-cycle-grid-cost")?.title,
     ).toContain("用网成本");
+
+    const mechanism = topicsById.get("renewable-mechanism-price");
+    expect(mechanism && "sourceDocument" in mechanism && mechanism.sourceDocument?.label).toBe(
+      "发改价格〔2025〕136号文",
+    );
+    expect(mechanism && "sourceDocument" in mechanism && mechanism.sourceDocument?.href).toBe(
+      "https://www.ndrc.gov.cn/xxgk/zcfb/tz/202502/t20250209_1396066.html",
+    );
+    expect(mechanism?.description).toContain("发改价格〔2025〕136号文");
   });
 
   it("uses regions as the only province registry", () => {
@@ -80,15 +90,22 @@ describe("China provincial market atlas taxonomy", () => {
   });
 
   it("keeps the database topic/field allow-list aligned with the shared taxonomy", () => {
-    const migration = readFileSync(
-      fileURLToPath(
-        new URL(
-          "../../supabase/migrations/202607240001_china_province_topic_module.sql",
-          import.meta.url,
+    // Initial seven-topic module plus follow-up enum/field migrations for
+    // renewable-mechanism-price (Postgres cannot add + use an enum in one txn).
+    const migration = [
+      "202607240001_china_province_topic_module.sql",
+      "202607280001_add_renewable_mechanism_price_topic.sql",
+      "202607280002_renewable_mechanism_price_topic_validation.sql",
+    ]
+      .map((name) =>
+        readFileSync(
+          fileURLToPath(
+            new URL(`../../supabase/migrations/${name}`, import.meta.url),
+          ),
+          "utf8",
         ),
-      ),
-      "utf8",
-    );
+      )
+      .join("\n");
 
     for (const topic of CHINA_MARKET_TOPICS) {
       expect(migration).toContain(`'${topic.id}'`);

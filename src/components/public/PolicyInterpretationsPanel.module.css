@@ -1,0 +1,281 @@
+.panel {
+  display: grid;
+  gap: 14px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--gl-rule, #d7ddd8);
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: 6px;
+  color: #6b7280;
+  font-family: var(--gl-font-mono, monospace);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.header h3 {
+  margin: 0;
+  color: var(--gl-signal-deep, #008234);
+  font-family: var(--gl-font-display, serif);
+  font-size: clamp(18px, 2.2vw, 24px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.summary {
+  max-width: 640px;
+  margin: 8px 0 0;
+  color: #556159;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.count {
+  color: #6b7280;
+  font-family: var(--gl-font-mono, monospace);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+}
+
+.filters label {
+  display: grid;
+  gap: 4px;
+  color: #667068;
+  font-size: 12px;
+}
+
+.filters select {
+  min-width: 140px;
+  padding: 7px 10px;
+  border: 1px solid var(--gl-rule, #d7ddd8);
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+}
+
+.filters input[type="date"] {
+  min-width: 140px;
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid var(--gl-rule, #d7ddd8);
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+}
+
+.search {
+  flex: 1 1 180px;
+  min-width: 160px;
+}
+
+.search input {
+  width: 100%;
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid var(--gl-rule, #d7ddd8);
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+}
+
+.searchAction {
+  display: grid;
+  gap: 4px;
+  align-content: end;
+}
+
+.searchActionLabel {
+  display: block;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.searchButton {
+  appearance: none;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid #0b5c2c;
+  border-radius: 8px;
+  background: #0b5c2c;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.searchButton:hover {
+  background: #094f26;
+}
+
+.list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 14px 14px 12px;
+  border: 1px solid var(--gl-rule, #d7ddd8);
+  border-radius: 12px;
+  background: #fbfcfb;
+}
+
+.itemMain {
+  min-width: min(100%, 420px);
+  flex: 1 1 420px;
+  display: grid;
+  gap: 6px;
+}
+
+.itemMain strong {
+  font-size: 15px;
+  font-weight: 650;
+  color: #1f2923;
+}
+
+.itemMain p {
+  margin: 0;
+  color: #556159;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  color: #7a807b;
+  font-family: var(--gl-font-mono, monospace);
+  font-size: 11px;
+}
+
+.kind {
+  color: #0b5c2c;
+  font-weight: 650;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #e8f2ea;
+  color: #1f6b3a;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.action,
+.actionPrimary {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--gl-rule, #d7ddd8);
+  background: #fff;
+  color: #243028;
+  font: inherit;
+  font-size: 13px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.actionPrimary {
+  border-color: #0b5c2c;
+  background: #0b5c2c;
+  color: #fff;
+}
+
+.empty,
+.error {
+  margin: 0;
+  color: #667068;
+  font-size: 13px;
+}
+
+.error {
+  color: #9b2c2c;
+}
+
+.preview {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #cfe0d2;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.previewHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.previewHead button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #0b5c2c;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.frame {
+  width: 100%;
+  min-height: 520px;
+  border: 1px solid var(--gl-rule, #d7ddd8);
+  border-radius: 8px;
+  background: #f3f5f3;
+}
+
+@media (max-width: 720px) {
+  .frame {
+    min-height: 360px;
+  }
+}
